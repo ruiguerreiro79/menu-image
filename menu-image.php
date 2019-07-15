@@ -100,6 +100,9 @@ class Menu_Image_Plugin {
 		// Add support of MegaMenu.
 		add_filter( 'megamenu_nav_menu_link_attributes', array( $this, 'menu_image_nav_menu_link_attributes_filter' ), 10, 3 );
 		add_filter( 'megamenu_the_title', array( $this, 'menu_image_nav_menu_item_title_filter' ), 10, 2 );
+		// Add support to WP Mobile Menu.
+		add_filter( 'mobilemenu_the_title', array( $this, 'menu_image_nav_menu_item_title_filter' ), 10, 2 );
+		
 	}
 
 	/**
@@ -277,7 +280,7 @@ class Menu_Image_Plugin {
 	/**
 	 * Filters the HTML attributes applied to a menu item's anchor element.
 	 *
-     * @param array $atts {
+	 * @param array $atts {
 	 *     The HTML attributes applied to the menu item's `<a>` element, empty strings are ignored.
 	 *
 	 *     @type string $title  Title attribute.
@@ -321,9 +324,15 @@ class Menu_Image_Plugin {
 	 * @return string
 	 */
 	public function menu_image_nav_menu_item_title_filter( $title, $item, $depth = null, $args = null) {
-	    if (is_numeric($item)) {
-	        $item = wp_setup_nav_menu_item( get_post( $item ) );
-        }
+
+		if ( is_numeric( $item ) && $item < 0 ) {
+			return $title;
+		}
+
+		if ( is_numeric( $item ) && $item > 0 ) {
+			$item = wp_setup_nav_menu_item( get_post( $item ) );
+		}
+
 		$image_size = $item->image_size ? $item->image_size : apply_filters( 'menu_image_default_size', 'menu-36x36' );
 		$position   = $item->title_position ? $item->title_position : apply_filters( 'menu_image_default_title_position', 'after' );
 		$class      = "menu-image-title-{$position}";
