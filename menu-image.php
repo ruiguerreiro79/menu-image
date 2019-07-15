@@ -7,11 +7,11 @@
 
 /*
 Plugin Name: Menu Image
-Plugin URI: https://makeyoulivebetter.org.ua/menu-image/
-Description: Provide uploading images to menu item
-Author: Alex Davyskiba aka Zviryatko
+Plugin URI: https://www.jedipress.com
+Description: Improve your navigation menu items with images, logos, icons, buttons.
+Author: Rui Guerreiro
 Version: 2.9.1
-Author URI: http://makeyoulivebetter.org.ua/
+Author URI: https://www.jedipress.com
 */
 
 /*  Copyright 2013  Zviryatko  (email : sanya.davyskiba@gmail.com)

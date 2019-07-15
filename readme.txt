@@ -1,9 +1,9 @@
-=== Menu Image ===
-Contributors: zviryatko
-Tags: menu, image, field, hover, wpml
-Donate link: http://makeyoulivebetter.org.ua/buy-beer
+=== Menu Image, Icons made easy ===
+Contributors: takanakui
+Tags: menu, navigation, image, icons, wpml
+Donate link: https://www.buymeacoffee.com/ruiguerreiro
 Requires at least: 4.4.0
-Tested up to: 4.7
+Tested up to: 5.2
 Stable tag: 2.9.1
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
