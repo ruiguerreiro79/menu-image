@@ -102,6 +102,8 @@ class Menu_Image_Plugin {
 		add_filter( 'megamenu_the_title', array( $this, 'menu_image_nav_menu_item_title_filter' ), 10, 2 );
 		// Add support to WP Mobile Menu.
 		add_filter( 'mobilemenu_the_title', array( $this, 'menu_image_nav_menu_item_title_filter' ), 10, 2 );
+		// Title filter.
+		add_filter( 'the_title', array( $this, 'menu_image_nav_menu_item_title_filter' ), 10, 4 );
 		
 	}
 
@@ -324,6 +326,10 @@ class Menu_Image_Plugin {
 	 * @return string
 	 */
 	public function menu_image_nav_menu_item_title_filter( $title, $item, $depth = null, $args = null) {
+
+		if ( ! is_nav_menu_item( $item ) ) {
+			return $title;
+		}
 
 		if ( is_numeric( $item ) && $item < 0 ) {
 			return $title;
