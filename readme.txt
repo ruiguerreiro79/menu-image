@@ -1,6 +1,6 @@
 === Menu Image, Icons made easy ===
 Contributors: takanakui
-Tags: menu, navigation, image, icons, wpml
+Tags: menu, navigation, image, icons, nav menu
 Donate link: https://www.buymeacoffee.com/ruiguerreiro
 Requires at least: 4.4.0
 Tested up to: 5.2
@@ -8,16 +8,37 @@ Stable tag: 2.9.1
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
-Adds a field to load the image in a menu item and displays the image inside the link in the menu before the text.
-Now WPML compliant.
+Adds an image or icon in the menu items. You can choose the position of the image (after, before, above, below) or even hide the menu item title.
+
 
 == Description ==
 
-Adds a field to load the image in a menu item and displays the image inside the link in the menu before the text.
-Now you can upload the second image and set to the mouse over/out effect.
-And also change position of title or hide title if need.
-And... load images via media uploader!
-Now WPML compliant!
+Easily add an image or icon in a menu item. Creating a better website menu.
+Control the position of the image or icon and also it's size.
+
+With Menu Image plugin you can do more, check some of the features:
+
+
+- Hide Title.
+- Add Image / Icon on the Left of the menu item title.
+- Add Image / Icon on the Right of the menu item title.
+- Add Image / Icon on the Above of the menu item title.
+- Add Image / Icon on the Below of the menu item title.
+- Switch images / icons on mouse over the menu item.
+
+It's compatible with WPML and no coding knowledge is required.
+
+= Related Plugins =
+* [Mobile Menu](https://wordpress.org/plugins/mobile-menu/): WP Mobile Menu is the best WordPress responsive mobile menu. Provide to your mobile visitor an easy access to your site content using any device smartphone/tablet/desktop.
+
+
+###I need help or I have a doubt, check our Support
+* Great Support, our free support is above the average.
+
+ <a target="_blank" href="https://wordpress.org/support/plugin/menu-image">Menu Image Support</a>
+
+Bug reports for Menu Image are [welcomed on GitHub](https://github.com/ruiguerreiro79/menu-image). Please note GitHub is not a support forum, and issues that aren’t properly qualified as bugs will be closed.
+
 
 == Installation ==
 
