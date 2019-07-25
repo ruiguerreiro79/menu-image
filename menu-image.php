@@ -54,8 +54,8 @@ class Menu_Image_Plugin {
 	 * List of processed menu item ids.
 	 *
 	 * Mark item id as processed for new core version, 'cause old themes
-     * doesn't supports filters like `nav_menu_link_attributes` and the only
-     * way is to override whole element in filter `walker_nav_menu_start_el`.
+	 * doesn't supports filters like `nav_menu_link_attributes` and the only
+	 * way is to override whole element in filter `walker_nav_menu_start_el`.
 	 *
 	 * @var array
 	 */
@@ -83,17 +83,16 @@ class Menu_Image_Plugin {
 		add_action( 'wp_enqueue_scripts', array( $this, 'menu_image_add_inline_style_action' ) );
 		add_action( 'admin_action_delete-menu-item-image', array( $this, 'menu_image_delete_menu_item_image_action' ) );
 		add_action( 'wp_ajax_set-menu-item-thumbnail', array( $this, 'wp_ajax_set_menu_item_thumbnail' ) );
-		// Add support for additional image types
+		// Add support for additional image types.
 		add_filter( 'file_is_displayable_image', array( $this, 'file_is_displayable_image' ), 10, 2 );
-		// Add support of WPML menus sync
+		// Add support of WPML menus sync.
 		add_action( 'wp_update_nav_menu_item', array( $this, 'wp_update_nav_menu_item_action' ), 10, 2 );
 		add_action( 'admin_init', array( $this, 'admin_init' ), 99 );
 		add_filter( 'jetpack_photon_override_image_downsize', array( $this, 'jetpack_photon_override_image_downsize_filter' ), 10, 2 );
-		add_filter( 'wp_get_attachment_image_attributes', array($this, 'wp_get_attachment_image_attributes'), 99, 3 );
-		
+		add_filter( 'wp_get_attachment_image_attributes', array( $this, 'wp_get_attachment_image_attributes' ), 99, 3 );
 		add_filter( 'megamenu_nav_menu_link_attributes', array( $this, 'menu_image_nav_menu_link_attributes_filter' ), 10, 3 );
 		add_filter( 'the_title', array( $this, 'menu_image_nav_menu_item_title_filter' ), 10, 4 );
-		
+
 	}
 
 	/**
@@ -101,39 +100,40 @@ class Menu_Image_Plugin {
 	 */
 	public function admin_init() {
 		// Add custom field for menu edit walker
-		if ( !has_action( 'wp_nav_menu_item_custom_fields' ) ) {
+		if ( ! has_action( 'wp_nav_menu_item_custom_fields' ) ) {
 			add_filter( 'wp_edit_nav_menu_walker', array( $this, 'menu_image_edit_nav_menu_walker_filter' ) );
 		}
 		add_action( 'wp_nav_menu_item_custom_fields', array( $this, 'menu_item_custom_fields' ), 10, 4 );
 	}
 
-	
-		// Create a helper function for easy SDK access.
-		public function mi_fs() {
-			global $mi_fs;
-	
-			if ( ! isset( $mi_fs ) ) {
-				// Include Freemius SDK.
-				require_once dirname(__FILE__) . '/freemius/start.php';
-	
-				$mi_fs = fs_dynamic_init( array(
-					'id'                  => '4123',
-					'slug'                => 'menu-image',
-					'premium_slug'        => 'menu-image-premium',
-					'type'                => 'plugin',
-					'public_key'          => 'pk_1a1cac31f5af1ba3d31bd86fe0e8b',
-					'is_premium'          => false,
-					'has_addons'          => false,
-					'has_paid_plans'      => false,
-					'menu'                => array(
-						'slug'           => 'menu-image-options',
-						'account'        => false,
-					),
-				) );
-			}
-	
-			return $mi_fs;
+	/**
+	 * Create a helper function for easy SDK access
+	 */
+	public function mi_fs() {
+		global $mi_fs;
+
+		if ( ! isset( $mi_fs ) ) {
+			// Include Freemius SDK.
+			require_once dirname( __FILE__ ) . '/freemius/start.php';
+
+			$mi_fs = fs_dynamic_init( array(
+				'id'                  => '4123',
+				'slug'                => 'menu-image',
+				'premium_slug'        => 'menu-image-premium',
+				'type'                => 'plugin',
+				'public_key'          => 'pk_1a1cac31f5af1ba3d31bd86fe0e8b',
+				'is_premium'          => false,
+				'has_addons'          => false,
+				'has_paid_plans'      => false,
+				'menu'                => array(
+					'slug'           => 'menu-image-options',
+					'account'        => false,
+				),
+			) );
 		}
+
+		return $mi_fs;
+	}
 
 	/**
 	 * Filter adds additional validation for image type
@@ -151,21 +151,23 @@ class Menu_Image_Plugin {
 
 		return in_array( $fileExtension, $this->additionalDisplayableImageExtensions );
 	}
-
+	/**
+	 * Create the Menu Image options page
+	 */
 	public function create_menu_image_options_page() {
 		add_menu_page(
 			'Menu Image',
 			'Menu Image',
 			'manage_options',
 			'menu-image-options',
-			array( $this, 'menu_image_options_page_html') ,
+			array( $this, 'menu_image_options_page_html' ) ,
 			'dashicons-menu',
 			20
 		);
 	}
 
 	public function menu_image_options_page_html() {
-		// check user capabilities
+		// check user capabilities.
 		if ( ! current_user_can( 'manage_options' ) ) {
 			return;
 		}
@@ -174,12 +176,12 @@ class Menu_Image_Plugin {
 		  <h1><?php esc_html( get_admin_page_title() ); ?></h1>
 		  <form action="options.php" method="post">
 			<?php
-			// output security fields for the registered setting "wporg_options"
+			// output security fields for the registered setting "wporg_options".
 			settings_fields( 'wporg_options' );
 			// output setting sections and their fields
-			// (sections are registered for "wporg", each field is registered to a specific section)
+			// (sections are registered for "wporg", each field is registered to a specific section).
 			do_settings_sections( 'wporg' );
-			// output save settings button
+			// output save settings button.
 			submit_button( 'Save Settings' );
 			?>
 		  </form>
@@ -196,9 +198,9 @@ class Menu_Image_Plugin {
 		add_post_type_support( 'nav_menu_item', array( 'thumbnail' ) );
 
 		$this->image_sizes = apply_filters( 'menu_image_default_sizes', $this->image_sizes );
-		if (is_array($this->image_sizes)) {
-			foreach ($this->image_sizes as $name => $params) {
-				add_image_size($name, $params[0], $params[1], ( array_key_exists(2, $params) ? $params[2] : false ) );
+		if ( is_array( $this->image_sizes ) ) {
+			foreach ( $this->image_sizes as $name => $params ) {
+				add_image_size( $name, $params[0], $params[1], ( array_key_exists( 2, $params ) ? $params[2] : false ) );
 			}
 		}
 		load_plugin_textdomain( 'menu-image', false, basename( dirname( __FILE__ ) ) . '/languages' );
@@ -228,10 +230,10 @@ class Menu_Image_Plugin {
 	public function menu_image_save_post_action( $post_id, $post ) {
 		$menu_image_settings = array(
 			'menu_item_image_size',
-			'menu_item_image_title_position'
+			'menu_item_image_title_position',
 		);
 		foreach ( $menu_image_settings as $setting_name ) {
-			if ( isset( $_POST[ $setting_name ][ $post_id ] ) && !empty( $_POST[ $setting_name ][ $post_id ] ) ) {
+			if ( isset( $_POST[ $setting_name ][ $post_id ] ) && ! empty( $_POST[ $setting_name ][ $post_id ] ) ) {
 				if ( $post->{"_$setting_name"} != $_POST[ $setting_name ][ $post_id ] ) {
 					update_post_meta( $post_id, "_$setting_name", esc_sql( $_POST[ $setting_name ][ $post_id ] ) );
 				}
@@ -256,19 +258,19 @@ class Menu_Image_Plugin {
 				'thumbnail_hover_id',
 			);
 
-			// iterate synchronized menus
+			// iterate synchronized menus.
 			foreach ( $icl_menus_sync->menus as $menu_id => $menu_data ) {
-				if ( !isset( $_POST[ 'sync' ][ 'add' ][ $menu_id ] ) ) {
+				if ( ! isset( $_POST[ 'sync' ][ 'add' ][ $menu_id ] ) ) {
 					continue;
 				}
 
-				// remove cache and get language current item menu
+				// remove cache and get language current item menu.
 				$cache_key   = md5( serialize( array( $item_menu_id, 'tax_nav_menu' ) ) );
 				$cache_group = 'get_language_for_element';
 				wp_cache_delete( $cache_key, $cache_group );
 				$lang = $sitepress->get_language_for_element( $item_menu_id, 'tax_nav_menu' );
 
-				if ( !isset( $run_times[ $menu_id ][ $lang ] ) ) {
+				if ( ! isset( $run_times[ $menu_id ][ $lang ] ) ) {
 					$run_times[ $menu_id ][ $lang ] = 0;
 				}
 
@@ -276,21 +278,21 @@ class Menu_Image_Plugin {
 				// and get original item id from counted position of synchronized
 				// items from POST data. That's all magic.
 				$post_item_ids = array();
-				foreach ( $_POST[ 'sync' ][ 'add' ][ $menu_id ] as $id => $lang_array ) {
+				foreach ( $_POST['sync']['add'][ $menu_id ] as $id => $lang_array ) {
 					if ( array_key_exists( $lang, $lang_array ) ) {
 						$post_item_ids[ ] = $id;
 					}
 				}
-				if ( !array_key_exists( $run_times[ $menu_id ][ $lang ], $post_item_ids ) ) {
+				if ( ! array_key_exists( $run_times[ $menu_id ][ $lang ], $post_item_ids ) ) {
 					continue;
 				}
 				$orig_item_id = $post_item_ids[ $run_times[ $menu_id ][ $lang ] ];
 
-				// iterate all item settings and save it for new item
+				// iterate all item settings and save it for new item.
 				$orig_item_meta = get_metadata( 'post', $orig_item_id );
 				foreach ( $menu_image_settings as $meta ) {
-					if ( isset( $orig_item_meta[ "_$meta" ] ) && isset( $orig_item_meta[ "_$meta" ][ 0 ] ) ) {
-						update_post_meta( $menu_item_db_id, "_$meta", $orig_item_meta[ "_$meta" ][ 0 ] );
+					if ( isset( $orig_item_meta[ "_$meta" ] ) && isset( $orig_item_meta[ "_$meta" ][0] ) ) {
+						update_post_meta( $menu_item_db_id, "_$meta", $orig_item_meta[ "_$meta" ][0] );
 					}
 				}
 				$run_times[ $menu_id ][ $lang ] ++;
@@ -314,16 +316,16 @@ class Menu_Image_Plugin {
 	 * @since 2.0
 	 */
 	public function menu_image_wp_setup_nav_menu_item( $item ) {
-		if ( !isset( $item->thumbnail_id ) ) {
+		if ( ! isset( $item->thumbnail_id ) ) {
 			$item->thumbnail_id = get_post_thumbnail_id( $item->ID );
 		}
-		if ( !isset( $item->thumbnail_hover_id ) ) {
+		if ( ! isset( $item->thumbnail_hover_id ) ) {
 			$item->thumbnail_hover_id = get_post_meta( $item->ID, '_thumbnail_hover_id', true );
 		}
-		if ( !isset( $item->image_size ) ) {
+		if ( ! isset( $item->image_size ) ) {
 			$item->image_size = get_post_meta( $item->ID, '_menu_item_image_size', true );
 		}
-		if ( !isset( $item->title_position ) ) {
+		if ( ! isset( $item->title_position ) ) {
 			$item->title_position = get_post_meta( $item->ID, '_menu_item_image_title_position', true );
 		}
 
@@ -350,7 +352,7 @@ class Menu_Image_Plugin {
 	public function menu_image_nav_menu_link_attributes_filter( $atts, $item, $args, $depth = null ) {
 		$this->setProcessed( $item->ID );
 		$position = $item->title_position ? $item->title_position : apply_filters( 'menu_image_default_title_position', 'after' );
-		$class    = ! empty( $atts[ 'class' ] ) ? $atts[ 'class' ] : '';
+		$class    = ! empty( $atts['class'] ) ? $atts['class'] : '';
 		$class    .= " menu-image-title-{$position}";
 		if ( $item->thumbnail_hover_id ) {
 			$class .= ' menu-image-hovered';
@@ -361,7 +363,7 @@ class Menu_Image_Plugin {
 		if ( ! empty( $args->walker ) && class_exists( 'FlatsomeNavDropdown' ) && $args->walker instanceof FlatsomeNavDropdown && ! is_null( $depth ) && $depth === 0 ) {
 			$class .= ' nav-top-link';
 		}
-		$atts[ 'class' ] = trim( $class );
+		$atts['class'] = trim( $class );
 
 		return $atts;
 	}
@@ -376,7 +378,7 @@ class Menu_Image_Plugin {
 	 *
 	 * @return string
 	 */
-	public function menu_image_nav_menu_item_title_filter( $title, $item, $depth = null, $args = null) {
+	public function menu_image_nav_menu_item_title_filter( $title, $item, $depth = null, $args = null ) {
 
 		if ( ! is_nav_menu_item( $item ) ) {
 			return $title;
@@ -398,7 +400,7 @@ class Menu_Image_Plugin {
 		if ( $item->thumbnail_hover_id ) {
 			$this->setUsedAttachments( $image_size, $item->thumbnail_hover_id );
 			$hover_image_src = wp_get_attachment_image_src( $item->thumbnail_hover_id, $image_size );
-			$margin_size     = $hover_image_src[ 1 ];
+			$margin_size     = $hover_image_src[1];
 			$image           = "<span class='menu-image-hover-wrapper'>";
 			$image .= wp_get_attachment_image( $item->thumbnail_id, $image_size, false, "class=menu-image {$class}" );
 			$image .= wp_get_attachment_image(
@@ -407,7 +409,7 @@ class Menu_Image_Plugin {
 					'style' => "margin-left: -{$margin_size}px;",
 				)
 			);
-			$image .= '</span>';;
+			$image .= '</span>';
 		} elseif ( $item->thumbnail_id ) {
 			$image = wp_get_attachment_image( $item->thumbnail_id, $image_size, false, "class=menu-image {$class}" );
 		}
@@ -432,7 +434,7 @@ class Menu_Image_Plugin {
 	/**
 	 * Replacement default menu item output.
 	 *
-	 * @param string $item_output Default item output
+	 * @param string $item_output Default item output.
 	 * @param object $item        Menu item data object.
 	 * @param int    $depth       Depth of menu item. Used for padding.
 	 * @param object $args
@@ -443,11 +445,11 @@ class Menu_Image_Plugin {
 		if ( $this->isProcessed( $item->ID ) ) {
 			return $item_output;
 		}
-		$attributes = !empty( $item->attr_title ) ? ' title="' . esc_attr( $item->attr_title ) . '"' : '';
-		$attributes .= !empty( $item->target ) ? ' target="' . esc_attr( $item->target ) . '"' : '';
-		$attributes .= !empty( $item->xfn ) ? ' rel="' . esc_attr( $item->xfn ) . '"' : '';
-		$attributes .= !empty( $item->url ) ? ' href="' . esc_attr( $item->url ) . '"' : '';
-		$attributes_array = shortcode_parse_atts($attributes);
+		$attributes = ! empty( $item->attr_title ) ? ' title="' . esc_attr( $item->attr_title ) . '"' : '';
+		$attributes .= ! empty( $item->target ) ? ' target="' . esc_attr( $item->target ) . '"' : '';
+		$attributes .= ! empty( $item->xfn ) ? ' rel="' . esc_attr( $item->xfn ) . '"' : '';
+		$attributes .= ! empty( $item->url ) ? ' href="' . esc_attr( $item->url ) . '"' : '';
+		$attributes_array = shortcode_parse_atts( $attributes );
 
 		$image_size = $item->image_size ? $item->image_size : apply_filters( 'menu_image_default_size', 'menu-36x36' );
 		$position   = $item->title_position ? $item->title_position : apply_filters( 'menu_image_default_title_position', 'after' );
@@ -489,7 +491,7 @@ class Menu_Image_Plugin {
 		foreach ( $attributes_array as $attr_name => $attr_value ) {
 			$attributes .= "{$attr_name}=\"$attr_value\" ";
 		}
-		$attributes = trim($attributes);
+		$attributes = trim( $attributes );
 
 		$item_output = "{$args->before}<a {$attributes}>";
 		$link        = $args->link_before . apply_filters( 'the_title', $item->title, $item->ID ) . $args->link_after;
@@ -548,7 +550,7 @@ class Menu_Image_Plugin {
 	 */
 	public function menu_image_delete_menu_item_image_action() {
 
-		$menu_item_id = (int) $_REQUEST[ 'menu-item' ];
+		$menu_item_id = (int) $_REQUEST['menu-item'];
 
 		check_admin_referer( 'delete-menu_item_image_' . $menu_item_id );
 
@@ -612,15 +614,16 @@ class Menu_Image_Plugin {
 		$content      = $this->wp_post_thumbnail_only_html( $item_id );
 
 		$image_size = get_post_meta( $item_id, '_menu_item_image_size', true );
-		if ( !$image_size ) {
+		if ( ! $image_size ) {
 			$image_size = $default_size;
 		}
 		$title_position = get_post_meta( $item_id, '_menu_item_image_title_position', true );
-		if ( !$title_position ) {
+		if ( ! $title_position ) {
 			$title_position = apply_filters( 'menu_image_default_title_position', 'after' );
 		}
 
-		ob_start(); ?>
+		ob_start();
+		?>
 
 		<div class="menu-item-image-options">
 			<p class="description description-wide">
@@ -629,8 +632,9 @@ class Menu_Image_Plugin {
 					<select id="edit-menu-item-image-size-<?php echo $item_id; ?>"
 							class="widefat edit-menu-item-image-size"
 							name="menu_item_image_size[<?php echo $item_id; ?>]">
-						<option value='full' <?php echo $image_size == 'full' ? ' selected="selected"' : '' ?>><?php _e( 'Original Size', 'menu-image' ) ?></option>
-						<?php foreach ( get_intermediate_image_sizes() as $size ) :
+						<option value='full' <?php echo $image_size == 'full' ? ' selected="selected"' : '' ?>><?php _e( 'Original Size', 'menu-image' ); ?></option>
+						<?php 
+						foreach ( get_intermediate_image_sizes() as $size ) :
 							printf(
 								"<option value='%s'%s>%s</option>\n",
 								esc_attr( $size ),
@@ -660,7 +664,8 @@ class Menu_Image_Plugin {
 						$label,
 						$position != 'after' ? ' | ' : ''
 					);
-				endforeach; ?>
+				endforeach;
+				?>
 
 			</p>
 		</div>
@@ -685,17 +690,17 @@ class Menu_Image_Plugin {
 	 * @since 2.0
 	 */
 	public function wp_ajax_set_menu_item_thumbnail() {
-		$json = !empty( $_REQUEST[ 'json' ] );
+		$json = ! empty( $_REQUEST['json'] );
 
-		$post_ID = intval( $_POST[ 'post_id' ] );
-		if ( !current_user_can( 'edit_post', $post_ID ) ) {
+		$post_ID = intval( $_POST['post_id'] );
+		if ( ! current_user_can( 'edit_post', $post_ID ) ) {
 			wp_die( - 1 );
 		}
 
-		$thumbnail_id = intval( $_POST[ 'thumbnail_id' ] );
-		$is_hovered   = (bool) $_POST[ 'is_hover' ];
+		$thumbnail_id = intval( $_POST['thumbnail_id'] );
+		$is_hovered   = (bool) $_POST['is_hover'];
 
-		check_ajax_referer( "update-menu-item" );
+		check_ajax_referer( 'update-menu-item' );
 
 		if ( $thumbnail_id == '-1' ) {
 			if ( $is_hovered ) {
@@ -731,12 +736,12 @@ class Menu_Image_Plugin {
 	 * @see https://core.trac.wordpress.org/ticket/18584
 	 */
 	public function menu_item_custom_fields( $item_id, $item, $depth, $args ) {
-		if (!$item_id && isset($item->ID)) {
+		if ( ! $item_id && isset( $item->ID ) ) {
 			$item_id = $item->ID;
 		}
 		?>
 		<div class="field-image hide-if-no-js wp-media-buttons">
-			<?php echo $this->wp_post_thumbnail_html( $item_id ) ?>
+			<?php echo $this->wp_post_thumbnail_html( $item_id ); ?>
 		</div>
 	<?php
 	}
@@ -810,7 +815,7 @@ class Menu_Image_Plugin {
 	 * @param int $id
 	 */
 	protected function setProcessed( $id ) {
-        $this->processed[] = $id;
+		$this->processed[] = $id;
 	}
 
 	/**
@@ -827,7 +832,7 @@ class Menu_Image_Plugin {
 
 $menu_image = new Menu_Image_Plugin();
 
-require_once(ABSPATH . 'wp-admin/includes/nav-menu.php');
+require_once( ABSPATH . 'wp-admin/includes/nav-menu.php' );
 
 class Menu_Image_Walker_Nav_Menu_Edit extends Walker_Nav_Menu_Edit {
 
@@ -849,8 +854,9 @@ class Menu_Image_Walker_Nav_Menu_Edit extends Walker_Nav_Menu_Edit {
 		$original_title = false;
 		if ( 'taxonomy' == $item->type ) {
 			$original_title = get_term_field( 'name', $item->object_id, $item->object, 'raw' );
-			if ( is_wp_error( $original_title ) )
+			if ( is_wp_error( $original_title ) ) {
 				$original_title = false;
+			}
 		} elseif ( 'post_type' == $item->type ) {
 			$original_object = get_post( $item->object_id );
 			$original_title = get_the_title( $original_object->ID );
@@ -876,7 +882,7 @@ class Menu_Image_Walker_Nav_Menu_Edit extends Walker_Nav_Menu_Edit {
 		} elseif ( isset( $item->post_status ) && 'draft' == $item->post_status ) {
 			$classes[] = 'pending';
 			/* translators: %s: title of menu item in draft status */
-			$title = sprintf( __('%s (Pending)'), $item->title );
+			$title = sprintf( __( '%s (Pending)' ), $item->title );
 		}
 
 		$title = ( ! isset( $item->label ) || '' == $item->label ) ? $title : $item->label;
@@ -886,7 +892,7 @@ class Menu_Image_Walker_Nav_Menu_Edit extends Walker_Nav_Menu_Edit {
 			$submenu_text = 'style="display: none;"';
 
 		?>
-		<li id="menu-item-<?php echo $item_id; ?>" class="<?php echo implode(' ', $classes ); ?>">
+		<li id="menu-item-<?php echo $item_id; ?>" class="<?php echo implode( ' ', $classes ); ?>">
 			<div class="menu-item-bar">
 				<div class="menu-item-handle">
 					<span class="item-title"><span class="menu-item-title"><?php echo esc_html( $title ); ?></span> <span class="is-submenu" <?php echo $submenu_text; ?>><?php _e( 'sub item' ); ?></span></span>
@@ -904,7 +910,7 @@ class Menu_Image_Walker_Nav_Menu_Edit extends Walker_Nav_Menu_Edit {
 									),
 									'move-menu_item'
 								);
-							?>" class="item-move-up" aria-label="<?php esc_attr_e( 'Move up' ) ?>">&#8593;</a>
+							?>" class="item-move-up" aria-label="<?php esc_attr_e( 'Move up' ); ?>">&#8593;</a>
 							|
 							<a href="<?php
 								echo wp_nonce_url(
@@ -913,7 +919,7 @@ class Menu_Image_Walker_Nav_Menu_Edit extends Walker_Nav_Menu_Edit {
 											'action' => 'move-down-menu-item',
 											'menu-item' => $item_id,
 										),
-										remove_query_arg($removed_args, admin_url( 'nav-menus.php' ) )
+										remove_query_arg( $removed_args, admin_url( 'nav-menus.php' ) )
 									),
 									'move-menu_item'
 								);
@@ -1006,7 +1012,7 @@ class Menu_Image_Walker_Nav_Menu_Edit extends Walker_Nav_Menu_Edit {
 						),
 						'delete-menu_item_' . $item_id
 					); ?>"><?php _e( 'Remove' ); ?></a> <span class="meta-sep hide-if-no-js"> | </span> <a class="item-cancel submitcancel hide-if-no-js" id="cancel-<?php echo $item_id; ?>" href="<?php echo esc_url( add_query_arg( array( 'edit-menu-item' => $item_id, 'cancel' => time() ), admin_url( 'nav-menus.php' ) ) );
-						?>#menu-item-settings-<?php echo $item_id; ?>"><?php _e('Cancel'); ?></a>
+						?>#menu-item-settings-<?php echo $item_id; ?>"><?php _e( 'Cancel' ); ?></a>
 				</div>
 
 				<input class="menu-item-data-db-id" type="hidden" name="menu-item-db-id[<?php echo $item_id; ?>]" value="<?php echo $item_id; ?>" />
