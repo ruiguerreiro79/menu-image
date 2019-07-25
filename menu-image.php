@@ -14,21 +14,6 @@ Version: 2.9.1
 Author URI: https://www.jedipress.com
 */
 
-/*  Copyright 2013  Zviryatko  (email : sanya.davyskiba@gmail.com)
-
-    This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License, version 2, as
-    published by the Free Software Foundation.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License
-    along with this program; if not, write to the Free Software
-    Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-*/
 
 /**
  * Provide attaching images to menu items.
@@ -85,8 +70,6 @@ class Menu_Image_Plugin {
 		add_action( 'admin_head-nav-menus.php', array( $this, 'menu_image_admin_head_nav_menus_action' ) );
 		add_filter( 'wp_setup_nav_menu_item', array( $this, 'menu_image_wp_setup_nav_menu_item' ) );
 		add_filter( 'nav_menu_link_attributes', array( $this, 'menu_image_nav_menu_link_attributes_filter' ), 10, 4 );
-		add_filter( 'nav_menu_item_title', array( $this, 'menu_image_nav_menu_item_title_filter' ), 10, 4 );
-		add_filter( 'walker_nav_menu_start_el', array( $this, 'menu_image_nav_menu_item_filter' ), 10, 4 );
 		add_action( 'wp_enqueue_scripts', array( $this, 'menu_image_add_inline_style_action' ) );
 		add_action( 'admin_action_delete-menu-item-image', array( $this, 'menu_image_delete_menu_item_image_action' ) );
 		add_action( 'wp_ajax_set-menu-item-thumbnail', array( $this, 'wp_ajax_set_menu_item_thumbnail' ) );
@@ -97,12 +80,8 @@ class Menu_Image_Plugin {
 		add_action( 'admin_init', array( $this, 'admin_init' ), 99 );
 		add_filter( 'jetpack_photon_override_image_downsize', array( $this, 'jetpack_photon_override_image_downsize_filter' ), 10, 2 );
 		add_filter( 'wp_get_attachment_image_attributes', array($this, 'wp_get_attachment_image_attributes'), 99, 3 );
-		// Add support of MegaMenu.
+		
 		add_filter( 'megamenu_nav_menu_link_attributes', array( $this, 'menu_image_nav_menu_link_attributes_filter' ), 10, 3 );
-		add_filter( 'megamenu_the_title', array( $this, 'menu_image_nav_menu_item_title_filter' ), 10, 2 );
-		// Add support to WP Mobile Menu.
-		add_filter( 'mobilemenu_the_title', array( $this, 'menu_image_nav_menu_item_title_filter' ), 10, 2 );
-		// Title filter.
 		add_filter( 'the_title', array( $this, 'menu_image_nav_menu_item_title_filter' ), 10, 4 );
 		
 	}
