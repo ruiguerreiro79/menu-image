@@ -127,6 +127,7 @@ class Menu_Image_Plugin {
 					'has_paid_plans'      => false,
 					'menu'                => array(
 						'slug'           => 'menu-image-options',
+						'account'        => false,
 					),
 				) );
 			}
