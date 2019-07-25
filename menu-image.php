@@ -33,6 +33,7 @@ class Menu_Image_Plugin {
 		'menu-48x48' => array( 48, 48, false ),
 	);
 
+	public $mi_fs;
 	/**
 	 * List of used attachment ids grouped by size.
 	 *
@@ -64,6 +65,15 @@ class Menu_Image_Plugin {
 	 * Plugin constructor, add all filters and actions.
 	 */
 	public function __construct() {
+
+		//Add new admin menu options page for Menu image.
+		add_action( 'admin_menu', array( $this, 'create_menu_image_options_page' ) );
+
+		// Init Freemius.
+		$this->mi_fs = $this->mi_fs();
+		// Uninstall Action.
+		$this->mi_fs->add_action( 'after_uninstall', array( $this, 'mm_fs_uninstall_cleanup' ) );
+		do_action( 'mi_fs_loaded' );
 		add_action( 'init', array( $this, 'menu_image_init' ) );
 		add_filter( 'manage_nav-menus_columns', array( $this, 'menu_image_nav_menu_manage_columns' ), 11 );
 		add_action( 'save_post_nav_menu_item', array( $this, 'menu_image_save_post_action' ), 10, 3 );
@@ -97,6 +107,33 @@ class Menu_Image_Plugin {
 		add_action( 'wp_nav_menu_item_custom_fields', array( $this, 'menu_item_custom_fields' ), 10, 4 );
 	}
 
+	
+		// Create a helper function for easy SDK access.
+		public function mi_fs() {
+			global $mi_fs;
+	
+			if ( ! isset( $mi_fs ) ) {
+				// Include Freemius SDK.
+				require_once dirname(__FILE__) . '/freemius/start.php';
+	
+				$mi_fs = fs_dynamic_init( array(
+					'id'                  => '4123',
+					'slug'                => 'menu-image',
+					'premium_slug'        => 'menu-image-premium',
+					'type'                => 'plugin',
+					'public_key'          => 'pk_1a1cac31f5af1ba3d31bd86fe0e8b',
+					'is_premium'          => false,
+					'has_addons'          => false,
+					'has_paid_plans'      => false,
+					'menu'                => array(
+						'slug'           => 'menu-image-options',
+					),
+				) );
+			}
+	
+			return $mi_fs;
+		}
+
 	/**
 	 * Filter adds additional validation for image type
 	 *
@@ -114,6 +151,40 @@ class Menu_Image_Plugin {
 		return in_array( $fileExtension, $this->additionalDisplayableImageExtensions );
 	}
 
+	public function create_menu_image_options_page() {
+		add_menu_page(
+			'Menu Image',
+			'Menu Image',
+			'manage_options',
+			'menu-image-options',
+			array( $this, 'menu_image_options_page_html') ,
+			'dashicons-menu',
+			20
+		);
+	}
+
+	public function menu_image_options_page_html() {
+		// check user capabilities
+		if ( ! current_user_can( 'manage_options' ) ) {
+			return;
+		}
+		?>
+		<div class="wrap">
+		  <h1><?php esc_html( get_admin_page_title() ); ?></h1>
+		  <form action="options.php" method="post">
+			<?php
+			// output security fields for the registered setting "wporg_options"
+			settings_fields( 'wporg_options' );
+			// output setting sections and their fields
+			// (sections are registered for "wporg", each field is registered to a specific section)
+			do_settings_sections( 'wporg' );
+			// output save settings button
+			submit_button( 'Save Settings' );
+			?>
+		  </form>
+		</div>
+		<?php
+	}
 	/**
 	 * Initialization action.
 	 *
