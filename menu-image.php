@@ -66,28 +66,34 @@ class Menu_Image_Plugin {
 	 */
 	public function __construct() {
 
-		//Add new admin menu options page for Menu image.
+		// Add new admin menu options page for Menu image.
 		add_action( 'admin_menu', array( $this, 'create_menu_image_options_page' ) );
-
+		// Register Menu Image settings.
+		add_action( 'admin_init', array( $this, 'register_mysettings' ) );
 		// Init Freemius.
 		$this->mi_fs = $this->mi_fs();
 		// Uninstall Action.
 		$this->mi_fs->add_action( 'after_uninstall', array( $this, 'mm_fs_uninstall_cleanup' ) );
+		// Freemius is loaded.
 		do_action( 'mi_fs_loaded' );
+
+		// Actions.
 		add_action( 'init', array( $this, 'menu_image_init' ) );
-		add_filter( 'manage_nav-menus_columns', array( $this, 'menu_image_nav_menu_manage_columns' ), 11 );
 		add_action( 'save_post_nav_menu_item', array( $this, 'menu_image_save_post_action' ), 10, 3 );
 		add_action( 'admin_head-nav-menus.php', array( $this, 'menu_image_admin_head_nav_menus_action' ) );
-		add_filter( 'wp_setup_nav_menu_item', array( $this, 'menu_image_wp_setup_nav_menu_item' ) );
-		add_filter( 'nav_menu_link_attributes', array( $this, 'menu_image_nav_menu_link_attributes_filter' ), 10, 4 );
 		add_action( 'wp_enqueue_scripts', array( $this, 'menu_image_add_inline_style_action' ) );
 		add_action( 'admin_action_delete-menu-item-image', array( $this, 'menu_image_delete_menu_item_image_action' ) );
 		add_action( 'wp_ajax_set-menu-item-thumbnail', array( $this, 'wp_ajax_set_menu_item_thumbnail' ) );
-		// Add support for additional image types.
-		add_filter( 'file_is_displayable_image', array( $this, 'file_is_displayable_image' ), 10, 2 );
 		// Add support of WPML menus sync.
 		add_action( 'wp_update_nav_menu_item', array( $this, 'wp_update_nav_menu_item_action' ), 10, 2 );
 		add_action( 'admin_init', array( $this, 'admin_init' ), 99 );
+
+		// Filters.
+		add_filter( 'wp_setup_nav_menu_item', array( $this, 'menu_image_wp_setup_nav_menu_item' ) );
+		add_filter( 'nav_menu_link_attributes', array( $this, 'menu_image_nav_menu_link_attributes_filter' ), 10, 4 );
+		add_filter( 'manage_nav-menus_columns', array( $this, 'menu_image_nav_menu_manage_columns' ), 11 );
+		// Add support for additional image types.
+		add_filter( 'file_is_displayable_image', array( $this, 'file_is_displayable_image' ), 10, 2 );
 		add_filter( 'jetpack_photon_override_image_downsize', array( $this, 'jetpack_photon_override_image_downsize_filter' ), 10, 2 );
 		add_filter( 'wp_get_attachment_image_attributes', array( $this, 'wp_get_attachment_image_attributes' ), 99, 3 );
 		add_filter( 'megamenu_nav_menu_link_attributes', array( $this, 'menu_image_nav_menu_link_attributes_filter' ), 10, 3 );
@@ -167,27 +173,48 @@ class Menu_Image_Plugin {
 	}
 
 	public function menu_image_options_page_html() {
+		
 		// check user capabilities.
 		if ( ! current_user_can( 'manage_options' ) ) {
 			return;
 		}
 		?>
-		<div class="wrap">
-		  <h1><?php esc_html( get_admin_page_title() ); ?></h1>
-		  <form action="options.php" method="post">
-			<?php
-			// output security fields for the registered setting "wporg_options".
-			settings_fields( 'wporg_options' );
-			// output setting sections and their fields
-			// (sections are registered for "wporg", each field is registered to a specific section).
-			do_settings_sections( 'wporg' );
-			// output save settings button.
-			submit_button( 'Save Settings' );
-			?>
-		  </form>
-		</div>
-		<?php
+<div class="wrap">
+<h1><?php _e( 'Menu Image Settings', 'menu-image' ); ?></h1>
+
+<form method="post" action="options.php">
+    <?php settings_fields( 'menu-image-settings-group' ); ?>
+    <?php do_settings_sections( 'menu-image-settings-group' ); ?>
+    <table class="form-table">
+        <tr valign="top">
+        <th scope="row">New Option Name</th>
+        <td><input type="text" name="new_option_name" value="<?php echo esc_attr( get_option('new_option_name') ); ?>" /></td>
+        </tr>
+         
+        <tr valign="top">
+        <th scope="row">Some Other Option</th>
+        <td><input type="text" name="some_other_option" value="<?php echo esc_attr( get_option('some_other_option') ); ?>" /></td>
+        </tr>
+        
+        <tr valign="top">
+        <th scope="row">Options, Etc.</th>
+        <td><input type="text" name="option_etc" value="<?php echo esc_attr( get_option('option_etc') ); ?>" /></td>
+        </tr>
+    </table>
+    
+    <?php submit_button(); ?>
+
+</form>
+</div>
+<?php 
 	}
+	
+	public function register_mysettings() {
+		register_setting( 'menu-image-settings-group', 'new_option_name' );
+		register_setting( 'menu-image-settings-group', 'some_other_option' );
+		register_setting( 'menu-image-settings-group', 'option_etc' );
+	}
+
 	/**
 	 * Initialization action.
 	 *
@@ -459,7 +486,7 @@ class Menu_Image_Plugin {
 		if ( $item->thumbnail_hover_id ) {
 			$this->setUsedAttachments( $image_size, $item->thumbnail_hover_id );
 			$hover_image_src = wp_get_attachment_image_src( $item->thumbnail_hover_id, $image_size );
-			$margin_size     = $hover_image_src[ 1 ];
+			$margin_size     = $hover_image_src[1];
 			$image           = "<span class='menu-image-hover-wrapper'>";
 			$image .= wp_get_attachment_image( $item->thumbnail_id, $image_size, false, "class=menu-image {$class}" );
 			$image .= wp_get_attachment_image(
@@ -468,7 +495,7 @@ class Menu_Image_Plugin {
 					'style' => "margin-left: -{$margin_size}px;",
 				)
 			);
-			$image .= '</span>';;
+			$image .= '</span>';
 			$class .= ' menu-image-hovered';
 		} elseif ( $item->thumbnail_id ) {
 			$image = wp_get_attachment_image( $item->thumbnail_id, $image_size, false, "class=menu-image {$class}" );
