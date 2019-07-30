@@ -10,7 +10,7 @@ Plugin Name: Menu Image
 Plugin URI: https://www.jedipress.com
 Description: Improve your navigation menu items with images, logos, icons, buttons.
 Author: Rui Guerreiro
-Version: 2.9.1
+Version: 2.9.2
 Author URI: https://www.jedipress.com
 */
 
@@ -84,6 +84,7 @@ class Menu_Image_Plugin {
 		add_action( 'wp_enqueue_scripts', array( $this, 'menu_image_add_inline_style_action' ) );
 		add_action( 'admin_action_delete-menu-item-image', array( $this, 'menu_image_delete_menu_item_image_action' ) );
 		add_action( 'wp_ajax_set-menu-item-thumbnail', array( $this, 'wp_ajax_set_menu_item_thumbnail' ) );
+
 		// Add support of WPML menus sync.
 		add_action( 'wp_update_nav_menu_item', array( $this, 'wp_update_nav_menu_item_action' ), 10, 2 );
 		add_action( 'admin_init', array( $this, 'admin_init' ), 99 );
@@ -92,11 +93,14 @@ class Menu_Image_Plugin {
 		add_filter( 'wp_setup_nav_menu_item', array( $this, 'menu_image_wp_setup_nav_menu_item' ) );
 		add_filter( 'nav_menu_link_attributes', array( $this, 'menu_image_nav_menu_link_attributes_filter' ), 10, 4 );
 		add_filter( 'manage_nav-menus_columns', array( $this, 'menu_image_nav_menu_manage_columns' ), 11 );
+
 		// Add support for additional image types.
 		add_filter( 'file_is_displayable_image', array( $this, 'file_is_displayable_image' ), 10, 2 );
 		add_filter( 'jetpack_photon_override_image_downsize', array( $this, 'jetpack_photon_override_image_downsize_filter' ), 10, 2 );
 		add_filter( 'wp_get_attachment_image_attributes', array( $this, 'wp_get_attachment_image_attributes' ), 99, 3 );
+
 		add_filter( 'megamenu_nav_menu_link_attributes', array( $this, 'menu_image_nav_menu_link_attributes_filter' ), 10, 3 );
+
 		add_filter( 'the_title', array( $this, 'menu_image_nav_menu_item_title_filter' ), 10, 4 );
 
 	}
@@ -157,6 +161,7 @@ class Menu_Image_Plugin {
 
 		return in_array( $fileExtension, $this->additionalDisplayableImageExtensions );
 	}
+
 	/**
 	 * Create the Menu Image options page
 	 */
@@ -172,47 +177,72 @@ class Menu_Image_Plugin {
 		);
 	}
 
+	/**
+	 * Validade Options form submission.
+	 */
+	public function handle_options_form(){
+		if( ! isset( $_POST['menu_image_form'] ) || ! wp_verify_nonce( $_POST['menu_image_form'], 'menu_image_options_update' ) ) { ?>
+			<div class="error">
+			   <p><?php _e( 'Sorry, your nonce was not correct. Please try again.', 'menu-image' );?></p>
+			</div> 
+			<?php
+			exit;
+		} else {
+
+			// Handle our form data.
+			$enable_menu_image_hover = $_POST['menu_image_hover'];
+			update_option( 'menu_image_hover', $enable_menu_image_hover );
+			?>
+			<div class="updated">
+				<p><?php _e( 'Your Menu Image settings were saved!', 'menu-image' );?></p>
+			</div>
+			<?php
+		}
+	}
+
+	/**
+	 * Create the Menu Image options page HTML
+	 */
 	public function menu_image_options_page_html() {
-		
+
 		// check user capabilities.
 		if ( ! current_user_can( 'manage_options' ) ) {
 			return;
 		}
+
+		// check if we are updating the options.
+		if ( isset( $_POST['updated'] ) && 'true' === $_POST['updated'] ) {
+			$this->handle_options_form();
+		}
+
 		?>
-<div class="wrap">
-<h1><?php _e( 'Menu Image Settings', 'menu-image' ); ?></h1>
+		<div class="wrap">
+		<h1><?php _e( 'Menu Image Settings', 'menu-image' ); ?></h1>
 
-<form method="post" action="options.php">
-    <?php settings_fields( 'menu-image-settings-group' ); ?>
-    <?php do_settings_sections( 'menu-image-settings-group' ); ?>
-    <table class="form-table">
-        <tr valign="top">
-        <th scope="row">New Option Name</th>
-        <td><input type="text" name="new_option_name" value="<?php echo esc_attr( get_option('new_option_name') ); ?>" /></td>
-        </tr>
-         
-        <tr valign="top">
-        <th scope="row">Some Other Option</th>
-        <td><input type="text" name="some_other_option" value="<?php echo esc_attr( get_option('some_other_option') ); ?>" /></td>
-        </tr>
-        
-        <tr valign="top">
-        <th scope="row">Options, Etc.</th>
-        <td><input type="text" name="option_etc" value="<?php echo esc_attr( get_option('option_etc') ); ?>" /></td>
-        </tr>
-    </table>
-    
-    <?php submit_button(); ?>
+		<form method="POST">
+			<?php wp_nonce_field( 'menu_image_options_update', 'menu_image_form' ); ?>
+			<?php settings_fields( 'menu-image-settings-group' ); ?>
+			<?php do_settings_sections( 'menu-image-settings-group' ); ?>
+			<input type="hidden" name="updated" value="true" />
+			<table class="form-table">
+				<tr valign="top">
+				
+				<th scope="row"><?php _e( 'Menu image Hover', 'menu-image' );?></th>
+				<td><input name="menu_image_hover" type="checkbox" value="1" <?php checked( '1', get_option( 'menu_image_hover', '1' ) ); ?> /><span class="helper"><?php _e( 'Enable the image on hover field', 'menu-image' ); ?></span></td>
+				</tr>
+			</table>
 
-</form>
-</div>
-<?php 
+			<?php submit_button(); ?>
+		</form>
+		</div>
+		<?php
 	}
-	
+
+	/**
+	 * Register Menu Image settings
+	 */
 	public function register_mysettings() {
-		register_setting( 'menu-image-settings-group', 'new_option_name' );
-		register_setting( 'menu-image-settings-group', 'some_other_option' );
-		register_setting( 'menu-image-settings-group', 'option_etc' );
+		register_setting( 'menu-image-settings-group', 'menu_image_hover' );
 	}
 
 	/**
@@ -613,16 +643,19 @@ class Menu_Image_Plugin {
 			$thumbnail_id ? '<a href="#" class="remove-post-thumbnail">' . __( 'Remove', 'menu-image' ) . '</a>' : ''
 		);
 
-		$hover_id = get_post_meta( $item_id, '_thumbnail_hover_id', true );
-		$content .= sprintf(
-			$markup,
-			esc_html__( 'Image on hover', 'menu-image' ),
-			$hover_id ? esc_attr__( 'Change menu item image on hover', 'menu-image' ) : esc_attr__( 'Set menu item image on hover', 'menu-image' ),
-			' hover-image',
-			$item_id,
-			$hover_id ? wp_get_attachment_image( $hover_id, $default_size ) : esc_html__( 'Set image on hover', 'menu-image' ),
-			$hover_id ? '<a href="#" class="remove-post-thumbnail hover-image">' . __( 'Remove', 'menu-image' ) . '</a>' : ''
-		);
+		// Menu image on hover if enabled.
+		if ( '1' == get_option( 'menu_image_hover', '1' ) ) {
+			$hover_id = get_post_meta( $item_id, '_thumbnail_hover_id', true );
+			$content .= sprintf(
+				$markup,
+				esc_html__( 'Image on hover', 'menu-image' ),
+				$hover_id ? esc_attr__( 'Change menu item image on hover', 'menu-image' ) : esc_attr__( 'Set menu item image on hover', 'menu-image' ),
+				' hover-image',
+				$item_id,
+				$hover_id ? wp_get_attachment_image( $hover_id, $default_size ) : esc_html__( 'Set image on hover', 'menu-image' ),
+				$hover_id ? '<a href="#" class="remove-post-thumbnail hover-image">' . __( 'Remove', 'menu-image' ) . '</a>' : ''
+			);
+		}
 
 		return $content;
 	}
@@ -825,8 +858,8 @@ class Menu_Image_Plugin {
 	 * @param WP_Post      $attachment Image attachment post.
 	 * @param string|array $size       Requested size. Image size or array of width and height values
 	 *                                 (in that order). Default 'thumbnail'.
-     *
-     * @return array Valid array of image attributes.
+	 *
+	 * @return array Valid array of image attributes.
 	 */
 	public function wp_get_attachment_image_attributes( $attr, $attachment, $size ) {
 		if ( $this->isAttachmentUsed( $attachment->ID, $size ) ) {
