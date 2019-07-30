@@ -407,20 +407,23 @@ class Menu_Image_Plugin {
 	 * @return array Link attributes.
 	 */
 	public function menu_image_nav_menu_link_attributes_filter( $atts, $item, $args, $depth = null ) {
-		$this->setProcessed( $item->ID );
-		$position = $item->title_position ? $item->title_position : apply_filters( 'menu_image_default_title_position', 'after' );
-		$class    = ! empty( $atts['class'] ) ? $atts['class'] : '';
-		$class    .= " menu-image-title-{$position}";
-		if ( $item->thumbnail_hover_id ) {
-			$class .= ' menu-image-hovered';
-		} elseif ( $item->thumbnail_id ) {
-			$class .= ' menu-image-not-hovered';
+
+		if ( '' !== $item->thumbnail_id ) {
+			$this->setProcessed( $item->ID );
+			$position = $item->title_position ? $item->title_position : apply_filters( 'menu_image_default_title_position', 'after' );
+			$class    = ! empty( $atts['class'] ) ? $atts['class'] : '';
+			$class    .= " menu-image-title-{$position}";
+			if ( $item->thumbnail_hover_id ) {
+				$class .= ' menu-image-hovered';
+			} elseif ( $item->thumbnail_id ) {
+				$class .= ' menu-image-not-hovered';
+			}
+			// Fix dropdown menu for Flatsome theme.
+			if ( ! empty( $args->walker ) && class_exists( 'FlatsomeNavDropdown' ) && $args->walker instanceof FlatsomeNavDropdown && ! is_null( $depth ) && $depth === 0 ) {
+				$class .= ' nav-top-link';
+			}
+			$atts['class'] = trim( $class );
 		}
-		// Fix dropdown menu for Flatsome theme.
-		if ( ! empty( $args->walker ) && class_exists( 'FlatsomeNavDropdown' ) && $args->walker instanceof FlatsomeNavDropdown && ! is_null( $depth ) && $depth === 0 ) {
-			$class .= ' nav-top-link';
-		}
-		$atts['class'] = trim( $class );
 
 		return $atts;
 	}
@@ -449,40 +452,44 @@ class Menu_Image_Plugin {
 			$item = wp_setup_nav_menu_item( get_post( $item ) );
 		}
 
-		$image_size = $item->image_size ? $item->image_size : apply_filters( 'menu_image_default_size', 'menu-36x36' );
-		$position   = $item->title_position ? $item->title_position : apply_filters( 'menu_image_default_title_position', 'after' );
-		$class      = "menu-image-title-{$position}";
-		$this->setUsedAttachments( $image_size, $item->thumbnail_id );
-		$image = '';
-		if ( $item->thumbnail_hover_id ) {
-			$this->setUsedAttachments( $image_size, $item->thumbnail_hover_id );
-			$hover_image_src = wp_get_attachment_image_src( $item->thumbnail_hover_id, $image_size );
-			$margin_size     = $hover_image_src[1];
-			$image           = "<span class='menu-image-hover-wrapper'>";
-			$image .= wp_get_attachment_image( $item->thumbnail_id, $image_size, false, "class=menu-image {$class}" );
-			$image .= wp_get_attachment_image(
-				$item->thumbnail_hover_id, $image_size, false, array(
-					'class' => "hovered-image {$class}",
-					'style' => "margin-left: -{$margin_size}px;",
-				)
-			);
-			$image .= '</span>';
-		} elseif ( $item->thumbnail_id ) {
-			$image = wp_get_attachment_image( $item->thumbnail_id, $image_size, false, "class=menu-image {$class}" );
+		// Process only if there is an menu image associated with the menu item.
+		if ( '' !== $item->thumbnail_id ) {
+			$image_size = $item->image_size ? $item->image_size : apply_filters( 'menu_image_default_size', 'menu-36x36' );
+			$position   = $item->title_position ? $item->title_position : apply_filters( 'menu_image_default_title_position', 'after' );
+			$class      = "menu-image-title-{$position}";
+			$this->setUsedAttachments( $image_size, $item->thumbnail_id );
+			$image = '';
+			if ( $item->thumbnail_hover_id ) {
+				$this->setUsedAttachments( $image_size, $item->thumbnail_hover_id );
+				$hover_image_src = wp_get_attachment_image_src( $item->thumbnail_hover_id, $image_size );
+				$margin_size     = $hover_image_src[1];
+				$image           = "<span class='menu-image-hover-wrapper'>";
+				$image .= wp_get_attachment_image( $item->thumbnail_id, $image_size, false, "class=menu-image {$class}" );
+				$image .= wp_get_attachment_image(
+					$item->thumbnail_hover_id, $image_size, false, array(
+						'class' => "hovered-image {$class}",
+						'style' => "margin-left: -{$margin_size}px;",
+					)
+				);
+				$image .= '</span>';
+			} elseif ( $item->thumbnail_id ) {
+				$image = wp_get_attachment_image( $item->thumbnail_id, $image_size, false, "class=menu-image {$class}" );
+			}
+			$none = ''; // Sugar.
+			switch ( $position ) {
+				case 'hide':
+				case 'before':
+				case 'above':
+					$item_args = array( $none, $title, $image );
+					break;
+				case 'after':
+				default:
+					$item_args = array( $image, $title, $none );
+					break;
+			}
+			$title = vsprintf( '%s<span class="menu-image-title">%s</span>%s', $item_args );
+
 		}
-		$none = ''; // Sugar.
-		switch ( $position ) {
-			case 'hide':
-			case 'before':
-			case 'above':
-				$item_args = array( $none, $title, $image );
-				break;
-			case 'after':
-			default:
-				$item_args = array( $image, $title, $none );
-				break;
-		}
-		$title = vsprintf( '%s<span class="menu-image-title">%s</span>%s', $item_args );
 
 		return $title;
 	}
