@@ -22,16 +22,16 @@ Author URI: https://www.jedipress.com
  */
 class Menu_Image_Plugin {
 
+	private $image_size_1 = '';
+	private $image_size_2 = '';
+	private $image_size_3 = '';
+
 	/**
 	 * Self provided image sizes for most menu usage.
 	 *
 	 * @var array
 	 */
-	protected $image_sizes = array(
-		'menu-24x24' => array( 24, 24, false ),
-		'menu-36x36' => array( 36, 36, false ),
-		'menu-48x48' => array( 48, 48, false ),
-	);
+	protected $image_sizes = array();
 
 	public $mi_fs;
 	/**
@@ -65,6 +65,25 @@ class Menu_Image_Plugin {
 	 * Plugin constructor, add all filters and actions.
 	 */
 	public function __construct() {
+
+		$this->image_size_1 = get_option( 'menu_image_size_1', '24x24' );
+		$this->image_size_2 = get_option( 'menu_image_size_2', '36x36' );
+		$this->image_size_3 = get_option( 'menu_image_size_3', '48x48' );
+
+		$image_parts_1 = explode('x', $this->image_size_1);
+		$image_parts_2 = explode('x', $this->image_size_2);
+		$image_parts_3 = explode('x', $this->image_size_3);
+
+		/**
+		 * Self provided image sizes for most menu usage.
+		 *
+		 * @var array
+		 */
+		$this->image_sizes = array(
+			'menu-' . $this->image_size_1 => array( $image_parts_1[0], $image_parts_1[1], false ),
+			'menu-' . $this->image_size_2 => array( $image_parts_2[0], $image_parts_2[1], false ),
+			'menu-' . $this->image_size_3 => array( $image_parts_3[0], $image_parts_3[1], false ),
+		);
 
 		// Add new admin menu options page for Menu image.
 		add_action( 'admin_menu', array( $this, 'create_menu_image_options_page' ) );
@@ -186,17 +205,34 @@ class Menu_Image_Plugin {
 			   <p><?php _e( 'Sorry, your nonce was not correct. Please try again.', 'menu-image' );?></p>
 			</div> 
 			<?php
-			exit;
 		} else {
 
 			// Handle our form data.
 			$enable_menu_image_hover = $_POST['menu_image_hover'];
-			update_option( 'menu_image_hover', $enable_menu_image_hover );
-			?>
-			<div class="updated">
-				<p><?php _e( 'Your Menu Image settings were saved!', 'menu-image' );?></p>
-			</div>
-			<?php
+			$menu_image_size_1       = $_POST['menu_image_size_1'];
+			$menu_image_size_2       = $_POST['menu_image_size_2'];
+			$menu_image_size_3       = $_POST['menu_image_size_3'];
+			$image_parts_1 = explode('x', $menu_image_size_1);
+			$image_parts_2 = explode('x', $menu_image_size_2);
+			$image_parts_3 = explode('x', $menu_image_size_3);
+
+			// Validate the menu image size format.
+			if ( 2 === count( $image_parts_1 ) &&  2 === count( $image_parts_2 ) &&  2 === count( $image_parts_3 )) {
+				update_option( 'menu_image_size_1', $menu_image_size_1 );
+				update_option( 'menu_image_size_2', $menu_image_size_2 );
+				update_option( 'menu_image_size_3', $menu_image_size_3 );
+				update_option( 'menu_image_hover', $enable_menu_image_hover );
+				?>
+				<div class="updated">
+					<p><?php _e( 'Your Menu Image settings were saved!', 'menu-image' );?></p>
+				</div>
+				<?php
+			} else { ?>
+				<div class="error">
+					<p><?php _e( 'Sorry, your image size format is not correct. Please try again.', 'menu-image' );?></p>
+				</div> 
+				<?php
+			}
 		}
 	}
 
@@ -230,6 +266,23 @@ class Menu_Image_Plugin {
 				<th scope="row"><?php _e( 'Menu image Hover', 'menu-image' );?></th>
 				<td><input name="menu_image_hover" type="checkbox" value="1" <?php checked( '1', get_option( 'menu_image_hover', '1' ) ); ?> /><span class="helper"><?php _e( 'Enable the image on hover field', 'menu-image' ); ?></span></td>
 				</tr>
+				<tr valign="top">
+				<th><h3><?php _e( 'Menu Image sizes ', 'menu-image' );?></h3></th>
+				</tr>
+				<tr valign="top">
+				
+				<th scope="row"><?php _e( '1st Menu Image size ', 'menu-image' );?></th>
+				<td><input name="menu_image_size_1" type="text" value="<?php echo get_option( 'menu_image_size_1', '24x24' ) ; ?>" /><span class="helper"><?php _e( 'Use this format (24x24), width and height.', 'menu-image' ); ?></span></td>
+				</tr>
+				<th scope="row"><?php _e( '2nd Menu Image size ', 'menu-image' );?></th>
+				<td><input name="menu_image_size_2" type="text" value="<?php echo get_option( 'menu_image_size_2', '36x36' ) ; ?>" /><span class="helper"><?php _e( 'Use this format (36x36), width and height.', 'menu-image' ); ?></span></td>
+				</tr>
+				<th scope="row"><?php _e( '3rd Menu Image size ', 'menu-image' );?></th>
+				<td><input name="menu_image_size_3" type="text" value="<?php echo get_option( 'menu_image_size_3', '48x48' ) ; ?>" /><span class="helper"><?php _e( 'Use this format (48x48), width and height.', 'menu-image' ); ?></span></td>
+				</tr>
+				<th scope="row"><?php _e( 'Warning:', 'menu-image' );?></th>
+				<td><span class="helper"> If you change the image sizes after uploading the images you will need to regenerate all thumbnails using this </span><a href="https://wordpress.org/plugins/regenerate-thumbnails/" target="_blank">plugin</a>.</td>
+				</tr>
 			</table>
 
 			<?php submit_button(); ?>
@@ -243,6 +296,9 @@ class Menu_Image_Plugin {
 	 */
 	public function register_mysettings() {
 		register_setting( 'menu-image-settings-group', 'menu_image_hover' );
+		register_setting( 'menu-image-settings-group', 'menu_image_size_1' );
+		register_setting( 'menu-image-settings-group', 'menu_image_size_2' );
+		register_setting( 'menu-image-settings-group', 'menu_image_size_3' );
 	}
 
 	/**
