@@ -639,7 +639,7 @@ class Menu_Image_Plugin {
 	 * Loading custom stylesheet to fix images positioning in match themes
 	 */
 	public function menu_image_add_inline_style_action() {
-		wp_register_style( 'menu-image', plugins_url( '', __FILE__ ) . '/menu-image.css', array(), '2.9.2' );
+		wp_register_style( 'menu-image', plugins_url( '', __FILE__ ) . '/includes/css/menu-image.css', array(), '2.9.2' );
 		wp_enqueue_style( 'menu-image' );
 	}
 
@@ -649,7 +649,7 @@ class Menu_Image_Plugin {
 	 * @since 2.0
 	 */
 	public function menu_image_admin_head_nav_menus_action() {
-		wp_enqueue_script( 'menu-image-admin', plugins_url( 'menu-image-admin.js', __FILE__ ), array( 'jquery' ), '2.9.2' );
+		wp_enqueue_script( 'menu-image-admin', plugins_url( '/includes/js/menu-image-admin.js', __FILE__ ), array( 'jquery' ), '2.9.2' );
 		wp_localize_script(
 			'menu-image-admin', 'menuImage', array(
 				'l10n'     => array(
