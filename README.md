@@ -1,10 +1,10 @@
 # Menu Image #
-**Contributors:** [zviryatko](https://profiles.wordpress.org/zviryatko)  
+**Contributors:** [takanakui](https://profiles.wordpress.org/takanakui)  
 **Tags:** menu, image, field, hover, wpml  
-**Donate link:** http://makeyoulivebetter.org.ua/buy-beer  
+**Donate link:** https://www.buymeacoffee.com/ruiguerreiro 
 **Requires at least:** 4.4.0  
-**Tested up to:** 4.7  
-**Stable tag:** 2.9.0  
+**Tested up to:** 5.2  
+**Stable tag:** 2.9.2  
 **License:** GPLv2 or later  
 **License URI:** http://www.gnu.org/licenses/gpl-2.0.html  
 
@@ -91,6 +91,18 @@ Then you can disable srcset (add it to your function.php):
 
 
 ## Changelog ##
+
+### 2.9.2 ###
+* New - Include Freemius framework.
+* New - Settings panel.
+* New - Option to enable/disable image on hover.
+* New - Options to change the custom image sizes.
+
+
+### 2.9.1 ###
+* Fix previous broken update.
+* Remove images srcset and sizes attributes.
+* Add autotests on for images view.
 
 ### 2.9.0 ###
 * Update admin part copy regarding to new wp version.
