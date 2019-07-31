@@ -112,6 +112,8 @@ add_filter( 'wp_calculate_image_srcset', '__return_false' );
 * New - Include Freemius framework.
 * New - Settings panel.
 * New - Option to enable/disable image on hover.
+* New - Options to change the custom image sizes.
+
 
 ### 2.9.1 ###
 * Fix previous broken update. Sorry for that, everyone is mistake.
