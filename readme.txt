@@ -1,5 +1,5 @@
 === Menu Image, Icons made easy ===
-Contributors: takanakui
+Contributors: takanakui, freemius
 Tags: menu, navigation, image, icons, nav menu
 Donate link: https://www.buymeacoffee.com/ruiguerreiro
 Requires at least: 4.4.0

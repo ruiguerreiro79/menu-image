@@ -10,7 +10,7 @@ Plugin Name: Menu Image
 Plugin URI: https://www.jedipress.com
 Description: Improve your navigation menu items with images, logos, icons, buttons.
 Author: Rui Guerreiro
-Version: 2.9.2
+Version: 2.9.2.1
 Author URI: https://www.jedipress.com
 */
 
@@ -281,7 +281,7 @@ class Menu_Image_Plugin {
 				<td><input name="menu_image_size_3" type="text" value="<?php echo get_option( 'menu_image_size_3', '48x48' ) ; ?>" /><span class="helper"><?php _e( 'Use this format (48x48), width and height.', 'menu-image' ); ?></span></td>
 				</tr>
 				<th scope="row"><?php _e( 'Warning:', 'menu-image' );?></th>
-				<td><span class="helper"> If you change the image sizes after uploading the images you will need to regenerate all thumbnails using this </span><a href="https://wordpress.org/plugins/regenerate-thumbnails/" target="_blank">plugin</a>.</td>
+				<td><span class="helper"> If you change the image sizes after uploading the images you will need to regenerate all thumbnails using this </span><a href="https://wordpress.org/plugins/regenerate-thumbnails/" target="_blank">plugin</a>.<p>It will also be necessary to select the icon image again in the menu items if you replaced any of the used custom image sizes.</p></td>
 				</tr>
 			</table>
 
@@ -494,9 +494,9 @@ class Menu_Image_Plugin {
 	 *
 	 * @return string
 	 */
-	public function menu_image_nav_menu_item_title_filter( $title, $item, $depth = null, $args = null ) {
+	public function menu_image_nav_menu_item_title_filter( $title, $item = null, $depth = null, $args = null ) {
 
-		if ( ! is_nav_menu_item( $item ) ) {
+		if ( ! is_nav_menu_item( $item ) || ! isset( $item ) ) {
 			return $title;
 		}
 
@@ -532,6 +532,8 @@ class Menu_Image_Plugin {
 				$image = wp_get_attachment_image( $item->thumbnail_id, $image_size, false, "class=menu-image {$class}" );
 			}
 			$none = ''; // Sugar.
+			$image = apply_filters( 'menu_image_img_html', $image );
+
 			switch ( $position ) {
 				case 'hide':
 				case 'before':
@@ -616,6 +618,8 @@ class Menu_Image_Plugin {
 		$item_output = "{$args->before}<a {$attributes}>";
 		$link        = $args->link_before . apply_filters( 'the_title', $item->title, $item->ID ) . $args->link_after;
 		$none		 = ''; // Sugar.
+		$image = apply_filters( 'menu_image_img_html', $image );
+
 		switch ( $position ) {
 			case 'hide':
 			case 'before':
