@@ -4,7 +4,7 @@ Tags: menu, navigation, image, icons, nav menu
 Donate link: https://www.buymeacoffee.com/ruiguerreiro
 Requires at least: 4.4.0
 Tested up to: 5.2
-Stable tag: 2.9.2
+Stable tag: 2.9.3
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -29,7 +29,7 @@ With Menu Image plugin you can do more, check some of the features:
 It's compatible with WPML and no coding knowledge is required.
 
 = Related Plugins =
-* [Mobile Menu](https://wordpress.org/plugins/mobile-menu/): WP Mobile Menu is the best WordPress responsive mobile menu. Provide to your mobile visitor an easy access to your site content using any device smartphone/tablet/desktop.
+* [Mobile Menu](https://www.wpmobilemenu.com/?utm_source=wordpressorg&utm_medium=menu-image&utm_campaign=plugin-description): WP Mobile Menu is the best WordPress responsive mobile menu. Provide to your mobile visitor an easy access to your site content using any device smartphone/tablet/desktop.
 
 
 ###I need help or I have a doubt, check our Support
