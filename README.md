@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/ruiguerreiro79/menu-image.svg?branch=master)](https://travis-ci.org/ruiguerreiro79/menu-image)
+
 # Menu Image #
 **Contributors:** [takanakui](https://profiles.wordpress.org/takanakui)  
 **Tags:** menu, image, field, hover, wpml  
