@@ -108,6 +108,13 @@ add_filter( 'wp_calculate_image_srcset', '__return_false' );
 2. Menu preview in standard twenty-thirteen theme
 
 == Changelog ==
+### 2.9.3 ###
+* New - Add compatibility with Max Megamenu.
+* New - Add new filter to change the markup of the image
+* Fix - Lower the Menu Image options to be below the WordPress Settings.
+* Fix - Update Mobile Menu Link.
+* Fix - Relocate CSS and JS resources.
+
 ### 2.9.2 ###
 * New - Include Freemius framework.
 * New - Settings panel.
