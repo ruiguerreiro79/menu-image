@@ -10,7 +10,7 @@ Plugin Name: Menu Image
 Plugin URI: https://www.jedipress.com
 Description: Improve your navigation menu items with images, logos, icons, buttons.
 Author: Rui Guerreiro
-Version: 2.9.2
+Version: 2.9.3
 Author URI: https://www.jedipress.com
 */
 
@@ -112,16 +112,18 @@ class Menu_Image_Plugin {
 		add_filter( 'wp_setup_nav_menu_item', array( $this, 'menu_image_wp_setup_nav_menu_item' ) );
 		add_filter( 'nav_menu_link_attributes', array( $this, 'menu_image_nav_menu_link_attributes_filter' ), 10, 4 );
 		add_filter( 'manage_nav-menus_columns', array( $this, 'menu_image_nav_menu_manage_columns' ), 11 );
+		add_filter( 'nav_menu_item_title', array( $this, 'menu_image_nav_menu_item_title_filter' ), 10, 4 );
 
 		// Add support for additional image types.
 		add_filter( 'file_is_displayable_image', array( $this, 'file_is_displayable_image' ), 10, 2 );
 		add_filter( 'jetpack_photon_override_image_downsize', array( $this, 'jetpack_photon_override_image_downsize_filter' ), 10, 2 );
 		add_filter( 'wp_get_attachment_image_attributes', array( $this, 'wp_get_attachment_image_attributes' ), 99, 3 );
 
-		add_filter( 'megamenu_nav_menu_link_attributes', array( $this, 'menu_image_nav_menu_link_attributes_filter' ), 10, 3 );
-
-		add_filter( 'the_title', array( $this, 'menu_image_nav_menu_item_title_filter' ), 10, 4 );
-
+		// Add support for Max Megamenu.
+		if ( function_exists( 'max_mega_menu_is_enabled' ) ) {
+			add_filter( 'megamenu_nav_menu_link_attributes', array( $this, 'menu_image_nav_menu_link_attributes_filter' ), 10, 3 );
+			add_filter( 'megamenu_the_title', array( $this, 'menu_image_nav_menu_item_title_filter' ), 10, 2 );
+		}
 	}
 
 	/**
@@ -192,7 +194,7 @@ class Menu_Image_Plugin {
 			'menu-image-options',
 			array( $this, 'menu_image_options_page_html' ) ,
 			'dashicons-menu',
-			20
+			150
 		);
 	}
 
@@ -208,13 +210,19 @@ class Menu_Image_Plugin {
 		} else {
 
 			// Handle our form data.
-			$enable_menu_image_hover = $_POST['menu_image_hover'];
-			$menu_image_size_1       = $_POST['menu_image_size_1'];
-			$menu_image_size_2       = $_POST['menu_image_size_2'];
-			$menu_image_size_3       = $_POST['menu_image_size_3'];
-			$image_parts_1 = explode('x', $menu_image_size_1);
-			$image_parts_2 = explode('x', $menu_image_size_2);
-			$image_parts_3 = explode('x', $menu_image_size_3);
+			$enable_menu_image_hover    = '0';
+
+			// If the value of the Menu Image Hover is set.
+			if ( isset( $_POST['menu_image_hover'] ) ) {
+				$enable_menu_image_hover   = $_POST['menu_image_hover'];
+			}
+
+			$menu_image_size_1         = $_POST['menu_image_size_1'];
+			$menu_image_size_2         = $_POST['menu_image_size_2'];
+			$menu_image_size_3         = $_POST['menu_image_size_3'];
+			$image_parts_1             = explode('x', $menu_image_size_1);
+			$image_parts_2             = explode('x', $menu_image_size_2);
+			$image_parts_3             = explode('x', $menu_image_size_3);
 
 			// Validate the menu image size format.
 			if ( 2 === count( $image_parts_1 ) &&  2 === count( $image_parts_2 ) &&  2 === count( $image_parts_3 )) {
@@ -262,26 +270,27 @@ class Menu_Image_Plugin {
 			<input type="hidden" name="updated" value="true" />
 			<table class="form-table">
 				<tr valign="top">
-				
-				<th scope="row"><?php _e( 'Menu image Hover', 'menu-image' );?></th>
-				<td><input name="menu_image_hover" type="checkbox" value="1" <?php checked( '1', get_option( 'menu_image_hover', '1' ) ); ?> /><span class="helper"><?php _e( 'Enable the image on hover field', 'menu-image' ); ?></span></td>
+					<th scope="row"><?php _e( 'Menu image Hover', 'menu-image' );?></th>
+					<td><input name="menu_image_hover" type="checkbox" value="1" <?php checked( '1', get_option( 'menu_image_hover', '1' ) ); ?> /><span class="helper"><?php _e( 'Enable the image on hover field', 'menu-image' ); ?></span></td>
 				</tr>
 				<tr valign="top">
-				<th><h3><?php _e( 'Menu Image sizes ', 'menu-image' );?></h3></th>
+					<th><h3><?php _e( 'Menu Image sizes ', 'menu-image' );?></h3></th>
 				</tr>
 				<tr valign="top">
-				
-				<th scope="row"><?php _e( '1st Menu Image size ', 'menu-image' );?></th>
-				<td><input name="menu_image_size_1" type="text" value="<?php echo get_option( 'menu_image_size_1', '24x24' ) ; ?>" /><span class="helper"><?php _e( 'Use this format (24x24), width and height.', 'menu-image' ); ?></span></td>
+					<th scope="row"><?php _e( '1st Menu Image size ', 'menu-image' );?></th>
+					<td><input name="menu_image_size_1" type="text" value="<?php echo get_option( 'menu_image_size_1', '24x24' ) ; ?>" /><span class="helper"><?php _e( 'Use this format (24x24), width and height.', 'menu-image' ); ?></span></td>
 				</tr>
-				<th scope="row"><?php _e( '2nd Menu Image size ', 'menu-image' );?></th>
-				<td><input name="menu_image_size_2" type="text" value="<?php echo get_option( 'menu_image_size_2', '36x36' ) ; ?>" /><span class="helper"><?php _e( 'Use this format (36x36), width and height.', 'menu-image' ); ?></span></td>
+				<tr>
+					<th scope="row"><?php _e( '2nd Menu Image size ', 'menu-image' );?></th>
+					<td><input name="menu_image_size_2" type="text" value="<?php echo get_option( 'menu_image_size_2', '36x36' ) ; ?>" /><span class="helper"><?php _e( 'Use this format (36x36), width and height.', 'menu-image' ); ?></span></td>
 				</tr>
-				<th scope="row"><?php _e( '3rd Menu Image size ', 'menu-image' );?></th>
-				<td><input name="menu_image_size_3" type="text" value="<?php echo get_option( 'menu_image_size_3', '48x48' ) ; ?>" /><span class="helper"><?php _e( 'Use this format (48x48), width and height.', 'menu-image' ); ?></span></td>
+				<tr>
+					<th scope="row"><?php _e( '3rd Menu Image size ', 'menu-image' );?></th>
+					<td><input name="menu_image_size_3" type="text" value="<?php echo get_option( 'menu_image_size_3', '48x48' ) ; ?>" /><span class="helper"><?php _e( 'Use this format (48x48), width and height.', 'menu-image' ); ?></span></td>
 				</tr>
-				<th scope="row"><?php _e( 'Warning:', 'menu-image' );?></th>
-				<td><span class="helper"> If you change the image sizes after uploading the images you will need to regenerate all thumbnails using this </span><a href="https://wordpress.org/plugins/regenerate-thumbnails/" target="_blank">plugin</a>.</td>
+				<tr>
+					<th scope="row"><?php _e( 'Warning:', 'menu-image' );?></th>
+					<td><span class="helper"> If you change the image sizes after uploading the images you will need to regenerate all thumbnails using this </span><a href="https://wordpress.org/plugins/regenerate-thumbnails/" target="_blank">plugin</a>.<p>It will also be necessary to select the icon image again in the menu items if you replaced any of the used custom image sizes.</p></td>
 				</tr>
 			</table>
 
@@ -317,6 +326,16 @@ class Menu_Image_Plugin {
 			}
 		}
 		load_plugin_textdomain( 'menu-image', false, basename( dirname( __FILE__ ) ) . '/languages' );
+
+		if ( ! is_admin() ) {
+
+			global $wp_filter;
+			if ( isset( $wp_filter['wp_nav_menu_args'] ) && 0 < count( $wp_filter['wp_nav_menu_args'] ) ) {
+				add_filter( 'walker_nav_menu_start_el', array( $this, 'menu_image_nav_menu_item_filter' ), 10, 4 );
+			} else {
+				add_filter( 'the_title', array( $this, 'menu_image_nav_menu_item_title_filter' ), 10, 4 );
+			}
+		}
 	}
 
 	/**
@@ -494,9 +513,9 @@ class Menu_Image_Plugin {
 	 *
 	 * @return string
 	 */
-	public function menu_image_nav_menu_item_title_filter( $title, $item, $depth = null, $args = null ) {
+	public function menu_image_nav_menu_item_title_filter( $title, $item = null, $depth = null, $args = null ) {
 
-		if ( ! is_nav_menu_item( $item ) ) {
+		if ( ! is_nav_menu_item( $item ) || ! isset( $item ) ) {
 			return $title;
 		}
 
@@ -532,6 +551,8 @@ class Menu_Image_Plugin {
 				$image = wp_get_attachment_image( $item->thumbnail_id, $image_size, false, "class=menu-image {$class}" );
 			}
 			$none = ''; // Sugar.
+			$image = apply_filters( 'menu_image_img_html', $image );
+
 			switch ( $position ) {
 				case 'hide':
 				case 'before':
@@ -616,6 +637,8 @@ class Menu_Image_Plugin {
 		$item_output = "{$args->before}<a {$attributes}>";
 		$link        = $args->link_before . apply_filters( 'the_title', $item->title, $item->ID ) . $args->link_after;
 		$none		 = ''; // Sugar.
+		$image = apply_filters( 'menu_image_img_html', $image );
+
 		switch ( $position ) {
 			case 'hide':
 			case 'before':
@@ -639,7 +662,7 @@ class Menu_Image_Plugin {
 	 * Loading custom stylesheet to fix images positioning in match themes
 	 */
 	public function menu_image_add_inline_style_action() {
-		wp_register_style( 'menu-image', plugins_url( '', __FILE__ ) . '/includes/css/menu-image.css', array(), '2.9.2' );
+		wp_register_style( 'menu-image', plugins_url( '', __FILE__ ) . '/includes/css/menu-image.css', array(), '2.9.3' );
 		wp_enqueue_style( 'menu-image' );
 	}
 
@@ -649,7 +672,7 @@ class Menu_Image_Plugin {
 	 * @since 2.0
 	 */
 	public function menu_image_admin_head_nav_menus_action() {
-		wp_enqueue_script( 'menu-image-admin', plugins_url( '/includes/js/menu-image-admin.js', __FILE__ ), array( 'jquery' ), '2.9.2' );
+		wp_enqueue_script( 'menu-image-admin', plugins_url( '/includes/js/menu-image-admin.js', __FILE__ ), array( 'jquery' ), '2.9.3' );
 		wp_localize_script(
 			'menu-image-admin', 'menuImage', array(
 				'l10n'     => array(
