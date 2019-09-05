@@ -330,7 +330,10 @@ class Menu_Image_Plugin {
 		if ( ! is_admin() ) {
 
 			global $wp_filter;
-			if ( isset( $wp_filter['wp_nav_menu_args'] ) && 0 < count( $wp_filter['wp_nav_menu_args'] ) ) {
+
+			$menu_filters_count = ( is_array($wp_filter['wp_nav_menu_args'] ) ? count( $wp_filter['wp_nav_menu_args'] )  : 0 );
+
+			if ( isset( $wp_filter['wp_nav_menu_args'] ) && 0 === $menu_filters_count ) {
 				add_filter( 'walker_nav_menu_start_el', array( $this, 'menu_image_nav_menu_item_filter' ), 10, 4 );
 			} else {
 				add_filter( 'the_title', array( $this, 'menu_image_nav_menu_item_title_filter' ), 10, 4 );
@@ -515,7 +518,7 @@ class Menu_Image_Plugin {
 	 */
 	public function menu_image_nav_menu_item_title_filter( $title, $item = null, $depth = null, $args = null ) {
 
-		if ( ! is_nav_menu_item( $item ) || ! isset( $item ) ) {
+		if ( ! is_nav_menu_item( $item ) || ! isset( $item ) || strpos( $title, 'menu-image' ) > 0 ) {
 			return $title;
 		}
 
