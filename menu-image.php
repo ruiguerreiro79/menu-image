@@ -1,7 +1,7 @@
 <?php
 /**
  * @package Menu_Image
- * @version 2.6.4
+ * @version 2.9.4
  * @licence GPLv2
  */
 
@@ -10,7 +10,7 @@ Plugin Name: Menu Image
 Plugin URI: https://www.jedipress.com
 Description: Improve your navigation menu items with images, logos, icons, buttons.
 Author: Rui Guerreiro
-Version: 2.9.3
+Version: 2.9.4
 Author URI: https://www.jedipress.com
 */
 
@@ -665,7 +665,7 @@ class Menu_Image_Plugin {
 	 * Loading custom stylesheet to fix images positioning in match themes
 	 */
 	public function menu_image_add_inline_style_action() {
-		wp_register_style( 'menu-image', plugins_url( '', __FILE__ ) . '/includes/css/menu-image.css', array(), '2.9.3' );
+		wp_register_style( 'menu-image', plugins_url( '', __FILE__ ) . '/includes/css/menu-image.css', array(), '2.9.4' );
 		wp_enqueue_style( 'menu-image' );
 	}
 
@@ -675,7 +675,7 @@ class Menu_Image_Plugin {
 	 * @since 2.0
 	 */
 	public function menu_image_admin_head_nav_menus_action() {
-		wp_enqueue_script( 'menu-image-admin', plugins_url( '/includes/js/menu-image-admin.js', __FILE__ ), array( 'jquery' ), '2.9.3' );
+		wp_enqueue_script( 'menu-image-admin', plugins_url( '/includes/js/menu-image-admin.js', __FILE__ ), array( 'jquery' ), '2.9.4' );
 		wp_localize_script(
 			'menu-image-admin', 'menuImage', array(
 				'l10n'     => array(

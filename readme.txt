@@ -108,6 +108,10 @@ add_filter( 'wp_calculate_image_srcset', '__return_false' );
 2. Menu preview in standard twenty-thirteen theme
 
 == Changelog ==
+
+### 2.9.4 ###
+* Fix - Bug of the duplicated images.
+
 ### 2.9.3 ###
 * New - Add compatibility with Max Megamenu.
 * New - Add new filter to change the markup of the image
