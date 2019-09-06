@@ -1,7 +1,7 @@
 <?php
 /**
  * @package Menu_Image
- * @version 2.9.4
+ * @version 2.9.5
  * @licence GPLv2
  */
 
@@ -10,7 +10,7 @@ Plugin Name: Menu Image
 Plugin URI: https://www.jedipress.com
 Description: Improve your navigation menu items with images, logos, icons, buttons.
 Author: Rui Guerreiro
-Version: 2.9.4
+Version: 2.9.5
 Author URI: https://www.jedipress.com
 */
 
@@ -113,6 +113,7 @@ class Menu_Image_Plugin {
 		add_filter( 'nav_menu_link_attributes', array( $this, 'menu_image_nav_menu_link_attributes_filter' ), 10, 4 );
 		add_filter( 'manage_nav-menus_columns', array( $this, 'menu_image_nav_menu_manage_columns' ), 11 );
 		add_filter( 'nav_menu_item_title', array( $this, 'menu_image_nav_menu_item_title_filter' ), 10, 4 );
+		add_filter( 'the_title', array( $this, 'menu_image_nav_menu_item_title_filter' ), 10, 4 );
 
 		// Add support for additional image types.
 		add_filter( 'file_is_displayable_image', array( $this, 'file_is_displayable_image' ), 10, 2 );
@@ -124,6 +125,7 @@ class Menu_Image_Plugin {
 			add_filter( 'megamenu_nav_menu_link_attributes', array( $this, 'menu_image_nav_menu_link_attributes_filter' ), 10, 3 );
 			add_filter( 'megamenu_the_title', array( $this, 'menu_image_nav_menu_item_title_filter' ), 10, 2 );
 		}
+
 	}
 
 	/**
@@ -314,7 +316,7 @@ class Menu_Image_Plugin {
 	 * Initialization action.
 	 *
 	 * Adding image sizes for most popular menu icon sizes. Adding thumbnail
-	 *  support to menu post type.
+	 * support to menu post type.
 	 */
 	public function menu_image_init() {
 		add_post_type_support( 'nav_menu_item', array( 'thumbnail' ) );
@@ -327,18 +329,6 @@ class Menu_Image_Plugin {
 		}
 		load_plugin_textdomain( 'menu-image', false, basename( dirname( __FILE__ ) ) . '/languages' );
 
-		if ( ! is_admin() ) {
-
-			global $wp_filter;
-
-			$menu_filters_count = ( is_array($wp_filter['wp_nav_menu_args'] ) ? count( $wp_filter['wp_nav_menu_args'] )  : 0 );
-
-			if ( isset( $wp_filter['wp_nav_menu_args'] ) && 0 === $menu_filters_count ) {
-				add_filter( 'walker_nav_menu_start_el', array( $this, 'menu_image_nav_menu_item_filter' ), 10, 4 );
-			} else {
-				add_filter( 'the_title', array( $this, 'menu_image_nav_menu_item_title_filter' ), 10, 4 );
-			}
-		}
 	}
 
 	/**
@@ -518,7 +508,7 @@ class Menu_Image_Plugin {
 	 */
 	public function menu_image_nav_menu_item_title_filter( $title, $item = null, $depth = null, $args = null ) {
 
-		if ( ! is_nav_menu_item( $item ) || ! isset( $item ) || strpos( $title, 'menu-image' ) > 0 ) {
+		if ( strpos( $title, 'menu-image' ) > 0 || ! is_nav_menu_item( $item ) || ! isset( $item ) ) {
 			return $title;
 		}
 
@@ -665,7 +655,7 @@ class Menu_Image_Plugin {
 	 * Loading custom stylesheet to fix images positioning in match themes
 	 */
 	public function menu_image_add_inline_style_action() {
-		wp_register_style( 'menu-image', plugins_url( '', __FILE__ ) . '/includes/css/menu-image.css', array(), '2.9.4' );
+		wp_register_style( 'menu-image', plugins_url( '', __FILE__ ) . '/includes/css/menu-image.css', array(), '2.9.5' );
 		wp_enqueue_style( 'menu-image' );
 	}
 
@@ -675,7 +665,7 @@ class Menu_Image_Plugin {
 	 * @since 2.0
 	 */
 	public function menu_image_admin_head_nav_menus_action() {
-		wp_enqueue_script( 'menu-image-admin', plugins_url( '/includes/js/menu-image-admin.js', __FILE__ ), array( 'jquery' ), '2.9.4' );
+		wp_enqueue_script( 'menu-image-admin', plugins_url( '/includes/js/menu-image-admin.js', __FILE__ ), array( 'jquery' ), '2.9.5' );
 		wp_localize_script(
 			'menu-image-admin', 'menuImage', array(
 				'l10n'     => array(
