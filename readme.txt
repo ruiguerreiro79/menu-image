@@ -109,6 +109,9 @@ add_filter( 'wp_calculate_image_srcset', '__return_false' );
 
 == Changelog ==
 
+### 2.9.5 ###
+* Fix - Remove unnecessary filter.
+
 ### 2.9.4 ###
 * Fix - Bug of the duplicated images.
 

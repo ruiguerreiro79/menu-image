@@ -57,3 +57,5 @@ before_script:
 
 script:
   - ./vendor/bin/codecept run
+
+slack: jedipress:l0BC5CQnvEsYxvXmQzDMmByA
