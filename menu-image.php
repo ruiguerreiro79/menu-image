@@ -1,7 +1,7 @@
 <?php
 /**
  * @package Menu_Image
- * @version 2.6.4
+ * @version 2.9.6
  * @licence GPLv2
  */
 
@@ -10,7 +10,7 @@ Plugin Name: Menu Image
 Plugin URI: https://www.jedipress.com
 Description: Improve your navigation menu items with images, logos, icons, buttons.
 Author: Rui Guerreiro
-Version: 2.9.3
+Version: 2.9.6
 Author URI: https://www.jedipress.com
 */
 
@@ -109,10 +109,12 @@ class Menu_Image_Plugin {
 		add_action( 'admin_init', array( $this, 'admin_init' ), 99 );
 
 		// Filters.
+		
 		add_filter( 'wp_setup_nav_menu_item', array( $this, 'menu_image_wp_setup_nav_menu_item' ) );
 		add_filter( 'nav_menu_link_attributes', array( $this, 'menu_image_nav_menu_link_attributes_filter' ), 10, 4 );
 		add_filter( 'manage_nav-menus_columns', array( $this, 'menu_image_nav_menu_manage_columns' ), 11 );
 		add_filter( 'nav_menu_item_title', array( $this, 'menu_image_nav_menu_item_title_filter' ), 10, 4 );
+		add_filter( 'the_title', array( $this, 'menu_image_nav_menu_item_title_filter' ), 10, 4 );
 
 		// Add support for additional image types.
 		add_filter( 'file_is_displayable_image', array( $this, 'file_is_displayable_image' ), 10, 2 );
@@ -314,7 +316,7 @@ class Menu_Image_Plugin {
 	 * Initialization action.
 	 *
 	 * Adding image sizes for most popular menu icon sizes. Adding thumbnail
-	 *  support to menu post type.
+	 * support to menu post type.
 	 */
 	public function menu_image_init() {
 		add_post_type_support( 'nav_menu_item', array( 'thumbnail' ) );
@@ -327,15 +329,6 @@ class Menu_Image_Plugin {
 		}
 		load_plugin_textdomain( 'menu-image', false, basename( dirname( __FILE__ ) ) . '/languages' );
 
-		if ( ! is_admin() ) {
-
-			global $wp_filter;
-			if ( isset( $wp_filter['wp_nav_menu_args'] ) && 0 < count( $wp_filter['wp_nav_menu_args'] ) ) {
-				add_filter( 'walker_nav_menu_start_el', array( $this, 'menu_image_nav_menu_item_filter' ), 10, 4 );
-			} else {
-				add_filter( 'the_title', array( $this, 'menu_image_nav_menu_item_title_filter' ), 10, 4 );
-			}
-		}
 	}
 
 	/**
@@ -451,13 +444,13 @@ class Menu_Image_Plugin {
 		if ( ! isset( $item->thumbnail_id ) ) {
 			$item->thumbnail_id = get_post_thumbnail_id( $item->ID );
 		}
-		if ( ! isset( $item->thumbnail_hover_id ) ) {
+		if ( ! isset( $item->thumbnail_hover_id ) && $item->thumbnail_id > 0 ) {
 			$item->thumbnail_hover_id = get_post_meta( $item->ID, '_thumbnail_hover_id', true );
 		}
-		if ( ! isset( $item->image_size ) ) {
+		if ( ! isset( $item->image_size ) && $item->thumbnail_id > 0 ) {
 			$item->image_size = get_post_meta( $item->ID, '_menu_item_image_size', true );
 		}
-		if ( ! isset( $item->title_position ) ) {
+		if ( ! isset( $item->title_position ) && $item->thumbnail_id > 0 ) {
 			$item->title_position = get_post_meta( $item->ID, '_menu_item_image_title_position', true );
 		}
 
@@ -483,7 +476,7 @@ class Menu_Image_Plugin {
 	 */
 	public function menu_image_nav_menu_link_attributes_filter( $atts, $item, $args, $depth = null ) {
 
-		if ( '' !== $item->thumbnail_id ) {
+		if ( '' !== $item->thumbnail_id && $item->thumbnail_id > 0 ) {
 			$this->setProcessed( $item->ID );
 			$position = $item->title_position ? $item->title_position : apply_filters( 'menu_image_default_title_position', 'after' );
 			$class    = ! empty( $atts['class'] ) ? $atts['class'] : '';
@@ -515,7 +508,7 @@ class Menu_Image_Plugin {
 	 */
 	public function menu_image_nav_menu_item_title_filter( $title, $item = null, $depth = null, $args = null ) {
 
-		if ( ! is_nav_menu_item( $item ) || ! isset( $item ) ) {
+		if ( strpos( $title, 'menu-image' ) > 0 || ! is_nav_menu_item( $item ) || ! isset( $item ) ) {
 			return $title;
 		}
 
@@ -528,7 +521,8 @@ class Menu_Image_Plugin {
 		}
 
 		// Process only if there is an menu image associated with the menu item.
-		if ( '' !== $item->thumbnail_id ) {
+		if ( '' !== $item->thumbnail_id && $item->thumbnail_id > 0 ) {
+
 			$image_size = $item->image_size ? $item->image_size : apply_filters( 'menu_image_default_size', 'menu-36x36' );
 			$position   = $item->title_position ? $item->title_position : apply_filters( 'menu_image_default_title_position', 'after' );
 			$class      = "menu-image-title-{$position}";
@@ -550,27 +544,28 @@ class Menu_Image_Plugin {
 			} elseif ( $item->thumbnail_id ) {
 				$image = wp_get_attachment_image( $item->thumbnail_id, $image_size, false, "class=menu-image {$class}" );
 			}
-			$none = ''; // Sugar.
+			$none  = ''; // Sugar.
 			$image = apply_filters( 'menu_image_img_html', $image );
+			$class .= ' menu-image-title'; 
 
 			switch ( $position ) {
 				case 'hide':
 				case 'before':
 				case 'above':
-					$item_args = array( $none, $title, $image );
+					$item_args = array( $none, $class, $title, $image );
 					break;
 				case 'after':
 				default:
-					$item_args = array( $image, $title, $none );
+					$item_args = array( $image, $class, $title, $none );
 					break;
 			}
-			$title = vsprintf( '%s<span class="menu-image-title">%s</span>%s', $item_args );
+
+			$title = vsprintf( '%s<span class="%s">%s</span>%s', $item_args );
 
 		}
 
 		return $title;
 	}
-
 
 	/**
 	 * Replacement default menu item output.
@@ -586,72 +581,75 @@ class Menu_Image_Plugin {
 		if ( $this->isProcessed( $item->ID ) ) {
 			return $item_output;
 		}
-		$attributes = ! empty( $item->attr_title ) ? ' title="' . esc_attr( $item->attr_title ) . '"' : '';
-		$attributes .= ! empty( $item->target ) ? ' target="' . esc_attr( $item->target ) . '"' : '';
-		$attributes .= ! empty( $item->xfn ) ? ' rel="' . esc_attr( $item->xfn ) . '"' : '';
-		$attributes .= ! empty( $item->url ) ? ' href="' . esc_attr( $item->url ) . '"' : '';
-		$attributes_array = shortcode_parse_atts( $attributes );
 
-		$image_size = $item->image_size ? $item->image_size : apply_filters( 'menu_image_default_size', 'menu-36x36' );
-		$position   = $item->title_position ? $item->title_position : apply_filters( 'menu_image_default_title_position', 'after' );
-		$class      = "menu-image-title-{$position}";
-		$this->setUsedAttachments( $image_size, $item->thumbnail_id );
-		$image = '';
-		if ( $item->thumbnail_hover_id ) {
-			$this->setUsedAttachments( $image_size, $item->thumbnail_hover_id );
-			$hover_image_src = wp_get_attachment_image_src( $item->thumbnail_hover_id, $image_size );
-			$margin_size     = $hover_image_src[1];
-			$image           = "<span class='menu-image-hover-wrapper'>";
-			$image .= wp_get_attachment_image( $item->thumbnail_id, $image_size, false, "class=menu-image {$class}" );
-			$image .= wp_get_attachment_image(
-				$item->thumbnail_hover_id, $image_size, false, array(
-					'class' => "hovered-image {$class}",
-					'style' => "margin-left: -{$margin_size}px;",
-				)
-			);
-			$image .= '</span>';
-			$class .= ' menu-image-hovered';
-		} elseif ( $item->thumbnail_id ) {
-			$image = wp_get_attachment_image( $item->thumbnail_id, $image_size, false, "class=menu-image {$class}" );
-			$class .= ' menu-image-not-hovered';
+		if ( '' !== $item->thumbnail_id && $item->thumbnail_id > 0 ) {
+			$attributes = ! empty( $item->attr_title ) ? ' title="' . esc_attr( $item->attr_title ) . '"' : '';
+			$attributes .= ! empty( $item->target ) ? ' target="' . esc_attr( $item->target ) . '"' : '';
+			$attributes .= ! empty( $item->xfn ) ? ' rel="' . esc_attr( $item->xfn ) . '"' : '';
+			$attributes .= ! empty( $item->url ) ? ' href="' . esc_attr( $item->url ) . '"' : '';
+			$attributes_array = shortcode_parse_atts( $attributes );
+
+			$image_size = $item->image_size ? $item->image_size : apply_filters( 'menu_image_default_size', 'menu-36x36' );
+			$position   = $item->title_position ? $item->title_position : apply_filters( 'menu_image_default_title_position', 'after' );
+			$class      = "menu-image-title-{$position}";
+			$this->setUsedAttachments( $image_size, $item->thumbnail_id );
+			$image = '';
+			if ( $item->thumbnail_hover_id ) {
+				$this->setUsedAttachments( $image_size, $item->thumbnail_hover_id );
+				$hover_image_src = wp_get_attachment_image_src( $item->thumbnail_hover_id, $image_size );
+				$margin_size     = $hover_image_src[1];
+				$image           = "<span class='menu-image-hover-wrapper'>";
+				$image .= wp_get_attachment_image( $item->thumbnail_id, $image_size, false, "class=menu-image {$class}" );
+				$image .= wp_get_attachment_image(
+					$item->thumbnail_hover_id, $image_size, false, array(
+						'class' => "hovered-image {$class}",
+						'style' => "margin-left: -{$margin_size}px;",
+					)
+				);
+				$image .= '</span>';
+				$class .= ' menu-image-hovered';
+			} elseif ( $item->thumbnail_id ) {
+				$image = wp_get_attachment_image( $item->thumbnail_id, $image_size, false, "class=menu-image {$class}" );
+				$class .= ' menu-image-not-hovered';
+			}
+			$attributes_array['class'] = $class;
+
+			/**
+			 * Filter the menu link attributes.
+			 *
+			 * @since 2.6.7
+			 *
+			 * @param array  $attributes An array of attributes.
+			 * @param object $item      Menu item data object.
+			 * @param int    $depth     Depth of menu item. Used for padding.
+			 * @param object $args
+			 */
+			$attributes_array = apply_filters( 'menu_image_link_attributes', $attributes_array, $item, $depth, $args );
+			$attributes = '';
+			foreach ( $attributes_array as $attr_name => $attr_value ) {
+				$attributes .= "{$attr_name}=\"$attr_value\" ";
+			}
+			$attributes = trim( $attributes );
+
+			$item_output = "{$args->before}<a {$attributes}>";
+			$link        = $args->link_before . apply_filters( 'the_title', $item->title, $item->ID ) . $args->link_after;
+			$none		 = ''; // Sugar.
+			$image = apply_filters( 'menu_image_img_html', $image );
+
+			switch ( $position ) {
+				case 'hide':
+				case 'before':
+				case 'above':
+					$item_args = array( $none, $link, $image );
+					break;
+				case 'after':
+				default:
+					$item_args = array( $image, $link, $none );
+					break;
+			}
+			$item_output .= vsprintf( '%s<span class="menu-image-title">%s</span>%s', $item_args );
+			$item_output .= "</a>{$args->after}";
 		}
-		$attributes_array['class'] = $class;
-
-		/**
-		 * Filter the menu link attributes.
-		 *
-		 * @since 2.6.7
-		 *
-		 * @param array  $attributes An array of attributes.
-		 * @param object $item      Menu item data object.
-		 * @param int    $depth     Depth of menu item. Used for padding.
-		 * @param object $args
-		 */
-		$attributes_array = apply_filters( 'menu_image_link_attributes', $attributes_array, $item, $depth, $args );
-		$attributes = '';
-		foreach ( $attributes_array as $attr_name => $attr_value ) {
-			$attributes .= "{$attr_name}=\"$attr_value\" ";
-		}
-		$attributes = trim( $attributes );
-
-		$item_output = "{$args->before}<a {$attributes}>";
-		$link        = $args->link_before . apply_filters( 'the_title', $item->title, $item->ID ) . $args->link_after;
-		$none		 = ''; // Sugar.
-		$image = apply_filters( 'menu_image_img_html', $image );
-
-		switch ( $position ) {
-			case 'hide':
-			case 'before':
-			case 'above':
-				$item_args = array( $none, $link, $image );
-				break;
-			case 'after':
-			default:
-				$item_args = array( $image, $link, $none );
-				break;
-		}
-		$item_output .= vsprintf( '%s<span class="menu-image-title">%s</span>%s', $item_args );
-		$item_output .= "</a>{$args->after}";
 
 		return $item_output;
 	}
@@ -662,7 +660,7 @@ class Menu_Image_Plugin {
 	 * Loading custom stylesheet to fix images positioning in match themes
 	 */
 	public function menu_image_add_inline_style_action() {
-		wp_register_style( 'menu-image', plugins_url( '', __FILE__ ) . '/includes/css/menu-image.css', array(), '2.9.3' );
+		wp_register_style( 'menu-image', plugins_url( '', __FILE__ ) . '/includes/css/menu-image.css', array(), '2.9.6' );
 		wp_enqueue_style( 'menu-image' );
 	}
 
@@ -672,7 +670,7 @@ class Menu_Image_Plugin {
 	 * @since 2.0
 	 */
 	public function menu_image_admin_head_nav_menus_action() {
-		wp_enqueue_script( 'menu-image-admin', plugins_url( '/includes/js/menu-image-admin.js', __FILE__ ), array( 'jquery' ), '2.9.3' );
+		wp_enqueue_script( 'menu-image-admin', plugins_url( '/includes/js/menu-image-admin.js', __FILE__ ), array( 'jquery' ), '2.9.6' );
 		wp_localize_script(
 			'menu-image-admin', 'menuImage', array(
 				'l10n'     => array(

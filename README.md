@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/ruiguerreiro79/menu-image.svg?branch=master)](https://travis-ci.org/ruiguerreiro79/menu-image)
+
 # Menu Image #
 **Contributors:** [takanakui](https://profiles.wordpress.org/takanakui)  
 **Tags:** menu, image, field, hover, wpml  
@@ -91,6 +93,19 @@ Then you can disable srcset (add it to your function.php):
 
 
 ## Changelog ##
+
+### 2.9.5 ###
+* Fix - Remove unnecessary filter.
+
+### 2.9.4 ###
+* Fix - Fix the duplicated images bug.
+
+### 2.9.3 ###
+* New - Add compatibility with Max Megamenu.
+* New - Add new filter to change the markup of the image
+* Fix - Lower the Menu Image options to be below the WordPress Settings.
+* Fix - Update Mobile Menu Link.
+* Fix - Relocate CSS and JS resources.
 
 ### 2.9.2 ###
 * New - Include Freemius framework.
