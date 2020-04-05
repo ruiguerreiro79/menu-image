@@ -3,8 +3,8 @@ Contributors: takanakui, freemius
 Tags: menu, navigation, image, icons, nav menu
 Donate link: https://www.buymeacoffee.com/ruiguerreiro
 Requires at least: 4.4.0
-Tested up to: 5.2
-Stable tag: 2.9.3
+Tested up to: 5.4
+Stable tag: 2.9.6
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -109,8 +109,12 @@ add_filter( 'wp_calculate_image_srcset', '__return_false' );
 
 == Changelog ==
 
+### 2.9.6 ###
+* Fix - Fix compatibility issue with WordPress 5.4.
+
 ### 2.9.5 ###
 * Fix - Remove unnecessary filter.
+* Fix - Adjust the CSS for title below.
 
 ### 2.9.4 ###
 * Fix - Bug of the duplicated images.
