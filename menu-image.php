@@ -11,7 +11,6 @@ Plugin URI: https://www.jedipress.com
 Description: Improve your navigation menu items with images, logos, icons, buttons.
 Author: Rui Guerreiro
 Version: 2.9.6
-
 Author URI: https://www.jedipress.com
 */
 
@@ -797,25 +796,26 @@ class Menu_Image_Plugin {
 			<p class="description description-wide">
 				<label><?php _e( 'Title position', 'menu-image' ); ?></label><br />
 				<?php
-				$positions = array(
-					'hide'   => __( 'Hide', 'menu-image' ),
-					'above'  => __( 'Above', 'menu-image' ),
-					'below'  => __( 'Below', 'menu-image' ),
-					'before' => __( 'Before', 'menu-image' ),
-					'after'  => __( 'After', 'menu-image' ),
-				);
-				foreach ( $positions as $position => $label ) :
-					printf(
-						"<label><input type='radio' name='menu_item_image_title_position[%s]' value='%s'%s/> %s</label>%s",
-						$item_id,
-						esc_attr( $position ),
-						$title_position == $position ? ' checked="checked"' : '',
-						$label,
-						$position != 'after' ? ' | ' : ''
-					);
-				endforeach;
-				?>
 
+					$positions = apply_filters('menu-image-positions', [
+						'hide'   => __( 'Hide', 'menu-image' ),
+						'above'  => __( 'Above', 'menu-image' ),
+						'below'  => __( 'Below', 'menu-image' ),
+						'before' => __( 'Before', 'menu-image' ),
+						'after'  => __( 'After', 'menu-image' ),
+					 ]);
+
+					foreach ( $positions as $position => $label ) :
+						printf(
+							"<label><input type='radio' name='menu_item_image_title_position[%s]' value='%s'%s/> %s</label>%s",
+							$item_id,
+							esc_attr( $position ),
+							$title_position == $position ? ' checked="checked"' : '',
+							$label,
+							$position != 'after' ? ' | ' : ''
+						);
+					endforeach;
+				?>
 			</p>
 		</div>
 
