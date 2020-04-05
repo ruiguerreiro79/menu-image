@@ -11,6 +11,7 @@ Plugin URI: https://www.jedipress.com
 Description: Improve your navigation menu items with images, logos, icons, buttons.
 Author: Rui Guerreiro
 Version: 2.9.6
+
 Author URI: https://www.jedipress.com
 */
 
@@ -126,6 +127,7 @@ class Menu_Image_Plugin {
 			add_filter( 'megamenu_nav_menu_link_attributes', array( $this, 'menu_image_nav_menu_link_attributes_filter' ), 10, 3 );
 			add_filter( 'megamenu_the_title', array( $this, 'menu_image_nav_menu_item_title_filter' ), 10, 2 );
 		}
+
 	}
 
 	/**
@@ -660,8 +662,10 @@ class Menu_Image_Plugin {
 	 * Loading custom stylesheet to fix images positioning in match themes
 	 */
 	public function menu_image_add_inline_style_action() {
+
 		wp_register_style( 'menu-image', plugins_url( '', __FILE__ ) . '/includes/css/menu-image.css', array(), '2.9.6' );
 		wp_enqueue_style( 'menu-image' );
+    
 	}
 
 	/**
@@ -670,6 +674,7 @@ class Menu_Image_Plugin {
 	 * @since 2.0
 	 */
 	public function menu_image_admin_head_nav_menus_action() {
+
 		wp_enqueue_script( 'menu-image-admin', plugins_url( '/includes/js/menu-image-admin.js', __FILE__ ), array( 'jquery' ), '2.9.6' );
 		wp_localize_script(
 			'menu-image-admin', 'menuImage', array(
