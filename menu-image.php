@@ -522,8 +522,7 @@ class Menu_Image_Plugin {
 		}
 
 		// Process only if there is an menu image associated with the menu item.
-		if ( '' !== $item->thumbnail_id && $item->thumbnail_id > 0 ) {
-
+		if ( gettype( $item ) !== 'string' && '' !== $item->thumbnail_id && $item->thumbnail_id > 0 ) {
 			$image_size = $item->image_size ? $item->image_size : apply_filters( 'menu_image_default_size', 'menu-36x36' );
 			$position   = $item->title_position ? $item->title_position : apply_filters( 'menu_image_default_title_position', 'after' );
 			$class      = "menu-image-title-{$position}";
