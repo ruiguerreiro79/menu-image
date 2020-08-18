@@ -111,9 +111,11 @@ add_filter( 'wp_calculate_image_srcset', '__return_false' );
 
 ### 2.9.7 ###
 * Fix - Fix Issue with display title above and below
+* Improvment - Update Freemius SDK to 2.4.0.1
 
 ### 2.9.6 ###
 * Fix - Fix compatibility issue with WordPress 5.4.
+* New - New filter for the Menu Image positions.
 
 ### 2.9.5 ###
 * Fix - Remove unnecessary filter.
