@@ -1,7 +1,7 @@
 <?php
 /**
  * @package Menu_Image
- * @version 2.9.6
+ * @version 2.9.7
  * @licence GPLv2
  */
 
@@ -10,7 +10,7 @@ Plugin Name: Menu Image
 Plugin URI: https://www.jedipress.com
 Description: Improve your navigation menu items with images, logos, icons, buttons.
 Author: Rui Guerreiro
-Version: 2.9.6
+Version: 2.9.7
 Author URI: https://www.jedipress.com
 */
 
