@@ -22,7 +22,7 @@
     padding-left: 10px;
 }
 
-.menu-image-title.menu-image-title-above, .menu-image-title.menu-image-title-below {
+.menu-item a.menu-image-title-above, .menu-item a.menu-image-title-below, .menu-image-title.menu-image-title-above, .menu-image-title.menu-image-title-below {
     text-align: center;
     display: block;
 }
